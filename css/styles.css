@@ -42,7 +42,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 #maincontent {
   background-color: #f3f3f3;
-  min-height: 100%;
+  /*min-height: 100%;*/
 }
 #footer {
   background-color: #444;
@@ -109,13 +109,15 @@ nav h1 a {
 #restaurants-list {
   background-color: #f3f3f3;
   list-style: outside none none;
+  list-style-type: none;
   margin: 0;
+  padding: 0;
   /*padding: 30px 15px 60px;*/
   text-align: center;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  /*justify-content: center;*/         /* Add all these so I can easily toggle them in devtools */
+  justify-content: center;         /* Add all these so I can easily toggle them in devtools */
   /*justify-content: space-around;*/
   /*align-content: space-between;*/
   /*align-content: space-around;*/
@@ -123,7 +125,7 @@ nav h1 a {
   /*align-content: center;*/
   /*align-content: flex-start;*/
   /*align-content: flex-end;*/
-  /*width: 100%;*/
+  width: 100%;
   /*padding: 100;*/
 }
 
@@ -131,7 +133,7 @@ nav h1 a {
   background-color: #fff;
   border: 2px solid #ccc;
   font-family: Arial,sans-serif;
-  /*margin: 15px;*/
+  margin: 15px;
   min-height: 380px;
   /*padding: 0 30px 25px;*/
   text-align: left;
