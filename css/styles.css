@@ -35,11 +35,14 @@ h1, h2, h3, h4, h5, h6 {
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   display: block;
 }
+#main-body {
+  display: flex;            /* Now the map reappeared */
+  flex-direction: column;
+  width: 100%;
+}
 #maincontent {
   background-color: #f3f3f3;
   min-height: 100%;
-  display: flex;            /* Now the map disappeared */
-  flex-dir: column;
 }
 #footer {
   background-color: #444;
@@ -52,15 +55,15 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 /* ====================== Navigation ====================== */
 nav {
-  width: 100%;
-  height: 2em;
+  /*width: 100%;*/
+  /*height: 2em;*/
   background-color: #252831;
   text-align:center;
 }
 nav h1 {
   margin: auto;
-  padding-top: .5em;       /* For no apparent reason, this put the nav under the map */
-  padding-bottom: .5em;    /* Going to try a flexbox in maincontent to see if I can fix */
+  padding-top: .5em; 
+  padding-bottom: .5em; 
 }
 nav h1 a {
   color: #fff;
@@ -112,14 +115,14 @@ nav h1 a {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
-  justify-content: space-around;
-  align-content: space-between;
-  align-content: space-around;
-  align-content: stretch;
-  align-content: center;
-  align-content: flex-start;
-  align-content: flex-end;
+  /*justify-content: center;*/         /* Add all these so I can easily toggle them in devtools */
+  /*justify-content: space-around;*/
+  /*align-content: space-between;*/
+  /*align-content: space-around;*/
+  /*align-content: stretch;*/
+  /*align-content: center;*/
+  /*align-content: flex-start;*/
+  /*align-content: flex-end;*/
   /*width: 100%;*/
   /*padding: 100;*/
 }
