@@ -38,6 +38,8 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 #maincontent {
   background-color: #f3f3f3;
   min-height: 100%;
+  display: flex;            /* Now the map disappeared */
+  flex-dir: column;
 }
 #footer {
   background-color: #444;
@@ -57,6 +59,8 @@ nav {
 }
 nav h1 {
   margin: auto;
+  padding-top: .5em;       /* For no apparent reason, this put the nav under the map */
+  padding-bottom: .5em;    /* Going to try a flexbox in maincontent to see if I can fix */
 }
 nav h1 a {
   color: #fff;
