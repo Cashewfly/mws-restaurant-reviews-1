@@ -118,7 +118,7 @@ nav h1 a {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;         /* Add all these so I can easily toggle them in devtools */
-  /*justify-content: space-around;*/
+  /*justify-content: space-around;*/ /* TODO: Remove these when done experimenting */
   /*align-content: space-between;*/
   /*align-content: space-around;*/
   /*align-content: stretch;*/
@@ -134,11 +134,11 @@ nav h1 a {
   border: 2px solid #ccc;
   font-family: Arial,sans-serif;
   margin: 15px;
-  min-height: 380px;
+  /*min-height: 380px;*/
   /*padding: 0 30px 25px;*/
   text-align: left;
   /*width: 270px;*/
-  max-width: 270px;
+  max-width: 270px;    /* TODO: Is this always correct across all viewport widths */
 }
 #restaurants-list .restaurant-img {
   background-color: #ccc;
@@ -162,7 +162,7 @@ nav h1 a {
   margin: 0;
   font-size: 11pt;
 }
-#restaurants-list li a {
+#restaurants-list li button {
   background-color: orange;
   border-bottom: 3px solid #eee;
   color: #fff;
