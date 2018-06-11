@@ -36,7 +36,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   display: block;
 }
 #main-body {
-  display: flex;            /* Now the map reappeared */
+  display: flex;
   flex-direction: column;
   width: 100%;
 }
@@ -138,7 +138,7 @@ nav h1 a {
   /*padding: 0 30px 25px;*/
   text-align: left;
   /*width: 270px;*/
-  max-width: 270px;    /* TODO: Is this always correct across all viewport widths */
+  max-width: 270px;    /* TODO: Is this always correct across all viewport widths? */
 }
 #restaurants-list .restaurant-img {
   background-color: #ccc;
@@ -162,8 +162,8 @@ nav h1 a {
   margin: 0;
   font-size: 11pt;
 }
-#restaurants-list li button {
-  background-color: orange;
+#restaurants-list li button {       /* Changed this to a button for semantics */
+  background-color: orange;         /* and appearance */
   border-bottom: 3px solid #eee;
   color: #fff;
   display: inline-block;
@@ -176,6 +176,11 @@ nav h1 a {
 }
 
 /* ====================== Restaurant Details ====================== */
+#inside {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 #breadcrumb {
   padding: 10px 40px 16px;
   list-style: none;
@@ -209,28 +214,35 @@ nav h1 a {
   text-decoration: underline;
 }
 .inside header {
-  position: fixed;
-  top: 0;
+  /*position: fixed;*/    /* On large displays I'm going to do multi-column */
+  /*top: 0;*/             /* So this will usually be visible.  On small, do */
+  width: 100%;            /* I really want to waste valuable screen on nav bar? */
+  /*z-index: 1000;*/
+}
+.inside #maincontent {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center; 
   width: 100%;
-  z-index: 1000;
 }
 .inside #map-container {
-  background: blue none repeat scroll 0 0;
+  /*background: blue none repeat scroll 0 0;*/
   /*height: 87%;      krs removed*/
   /*position: fixed;  krs removed*/
   /*right: 0;         krs removed*/
   /*top: 80px;        krs removed*/
-  width: 50%;
 }
 .inside #map {
-  background-color: #ccc;
-  height: 100%;
+  /*background-color: #ccc;*/
+  height: 400px;
+  /*height: 100%;*/
   width: 100%;
 }
 .inside #footer {
   bottom: 0;
   position: absolute;
-  width: 50%;
+  width: 100%;
 }
 #restaurant-name {
   color: #f18200;
@@ -261,11 +273,11 @@ nav h1 a {
   text-transform: uppercase;
   width: 90%;
 }
-#restaurant-container, #reviews-container {
+#restaurant-container, #reviews-container, .inside #map-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
-  padding: 140px 40px 30px;
-  width: 50%;
+  /*padding: 140px 40px 30px;*/
+  width: 30%;
 }
 #reviews-container {
   padding: 30px 40px 80px;
@@ -298,10 +310,10 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
-
 /* krs - start of my overrides */
 
 /* ====================== Restaurant Details ====================== */
+/*
 
 #restaurant-container {
   padding-top: 82px;
@@ -330,6 +342,7 @@ nav h1 a {
   position: absolute;
   left: 0%;
 }
+*/
 /* This is messing with my 3 column thing above
 body {
   max-width: 1100px;
