@@ -55,9 +55,22 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
+  // The widest the picture will be on the 2 column details screen which is 
+  // 50% of the max 1100px screen, so 550px.  Narrowest is on the 3 column selector
+  // screen which is 270px.  That's not much of a range...
+  //
+  // I'm going to make 300px 600px versions to give some wiggle room on my column
+  // percentages
+
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+
+  const image_300 = DBHelper.imageUrlForRestaurant(restaurant).replace(".","_300.");
+  const image_600 = image_300.replace("_300.","_600.");
+
+  console.log("image_300 is " + image_300 + ", image_600 is " + image_600);
+
+  image.src = image_300;
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
