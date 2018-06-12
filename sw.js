@@ -1,16 +1,17 @@
-var staticCacheName = 'wittr-static-v3';
+var staticCacheName = 'restrev-v2';
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(staticCacheName).then(function(cache) {
+      console.log("caches.open worked.  Adding assets");
       return cache.addAll([
       "/",
       "/index.html",
       "/restaurant.html",
+      "/sw.js",
       "/css/styles.css",
       "/js/dbhelper.js",
-      "/js/indexController.js",               // TODO Need to change this to sw-register.js or something
-      "/js/index.js",                         // TODO Need to change this to sw.js or something
+      "/js/sw-register.js",    
       "/js/main.js",
       "/js/restaurant_info.js",
       ]).catch(function(error) {
@@ -21,11 +22,12 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('activate', function(event) {
+  console.log("activate");
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.filter(function(cacheName) {
-          return cacheName.startsWith('wittr-') &&
+          return cacheName.startsWith('restrev-') &&
                  cacheName != staticCacheName;
         }).map(function(cacheName) {
           return caches.delete(cacheName);
@@ -36,17 +38,11 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  // TODO:  respond to requests for the root page with
-  // the page skeleton from the cache
+  console.log("fetch");
+  //var requestUrl = new URL(event.request.url);
 
-  var requestUrl	=	new URL(event.request.url);
-
-  if (requestUrl.origin === location.origin) {
-    if (requestUrl.pathname === '/') {
-      event.respondWith(caches.match('/skeleton'));
-      return;
-    }
-  }
+  //console.log("fetch: requestUrl is " + requestUrl);
+  //
 
   event.respondWith(
     caches.match(event.request).then(function(response) {
