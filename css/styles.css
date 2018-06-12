@@ -117,16 +117,8 @@ nav h1 a {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;         /* Add all these so I can easily toggle them in devtools */
-  /*justify-content: space-around;*/ /* TODO: Remove these when done experimenting */
-  /*align-content: space-between;*/
-  /*align-content: space-around;*/
-  /*align-content: stretch;*/
-  /*align-content: center;*/
-  /*align-content: flex-start;*/
-  /*align-content: flex-end;*/
+  justify-content: center; 
   width: 100%;
-  /*padding: 100;*/
 }
 
 #restaurants-list li {

@@ -3,7 +3,7 @@ var staticCacheName = 'restrev-v2';
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(staticCacheName).then(function(cache) {
-      console.log("caches.open worked.  Adding assets");
+      //console.log("caches.open worked.  Adding assets");
       return cache.addAll([
       "/",
       "/index.html",
@@ -22,7 +22,7 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('activate', function(event) {
-  console.log("activate");
+  //console.log("activate");
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
@@ -38,12 +38,7 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  console.log("fetch");
-  //var requestUrl = new URL(event.request.url);
-
-  //console.log("fetch: requestUrl is " + requestUrl);
-  //
-
+  //console.log("fetch");
   event.respondWith(
     caches.match(event.request).then(function(response) {
       return response || fetch(event.request);
