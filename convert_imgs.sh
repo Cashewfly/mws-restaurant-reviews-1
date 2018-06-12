@@ -1,9 +1,11 @@
 #!/bin/sh
 
-for fin in img/*.jpg ; do
+rm img/*00.jpg
+
+for fin in img/?.jpg img/??.jpg ; do
 	echo "$fin"
 
-	for width in 300 600 ; do
+	for width in 400 600 ; do
 		fout=`echo "$fin" | sed "s/\./_$width./"`
 
 		echo "$fout"

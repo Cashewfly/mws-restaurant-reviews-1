@@ -54,26 +54,32 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
+  address.setAttribute("aria-label","Address is " + restaurant.address);
 
   // The widest the picture will be on the 2 column details screen which is 
   // 50% of the max 1100px screen, so 550px.  Narrowest is on the 3 column selector
-  // screen which is 270px.  That's not much of a range...
+  // screen which is a bit over 300px.  That's not much of a range...
   //
-  // I'm going to make 300px 600px versions to give some wiggle room on my column
+  // I'm going to make 400px and 600px versions to give some wiggle room on my column
   // percentages
+  //
+  // Note that convert_imgs.sh is used to create the images
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
 
-  const image_300 = DBHelper.imageUrlForRestaurant(restaurant).replace(".","_300.");
-  const image_600 = image_300.replace("_300.","_600.");
+  const image_400 = DBHelper.imageUrlForRestaurant(restaurant).replace(".","_400.");
+  const image_600 = image_400.replace("_400.","_600.");
 
-  console.log("image_300 is " + image_300 + ", image_600 is " + image_600);
+  //console.log("image_400 is " + image_400 + ", image_600 is " + image_600);
 
-  image.src = image_300;
+  image.src = image_400;
+  image.srcset = image_400 + " 400w, " + image_600 + " 600w";
+  image.alt = "Photo of " + restaurant.name;
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+  cuisine.setAttribute("aria-label","Cuisine is " + restaurant.cuisine_type);
 
   // fill operating hours
   if (restaurant.operating_hours) {
