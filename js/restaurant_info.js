@@ -71,8 +71,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image_400 = DBHelper.imageUrlForRestaurant(restaurant).replace(".","_400.");
   const image_600 = image_400.replace("_400.","_600.");
 
-  //console.log("image_400 is " + image_400 + ", image_600 is " + image_600);
-
   image.src = image_400;
   image.srcset = image_400 + " 400w, " + image_600 + " 600w";
   image.alt = "Photo of " + restaurant.name;

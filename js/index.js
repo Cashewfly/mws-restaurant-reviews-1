@@ -1,18 +1,21 @@
 var staticCacheName = 'wittr-static-v3';
 
 self.addEventListener('install', function(event) {
-  // TODO: cache /skeleton rather than the root page
-
   event.waitUntil(
     caches.open(staticCacheName).then(function(cache) {
       return cache.addAll([
-        '/skeleton',
-        'js/main.js',
-        'css/main.css',
-        'imgs/icon.png',
-        'https://fonts.gstatic.com/s/roboto/v15/2UX7WLTfW3W8TclTUvlFyQ.woff',
-        'https://fonts.gstatic.com/s/roboto/v15/d-6IYplOFocCacKzxwXSOD8E0i7KZn-EPnyo3HZu7kw.woff'
-      ]);
+      "/",
+      "/index.html",
+      "/restaurant.html",
+      "/css/styles.css",
+      "/js/dbhelper.js",
+      "/js/indexController.js",               // TODO Need to change this to sw-register.js or something
+      "/js/index.js",                         // TODO Need to change this to sw.js or something
+      "/js/main.js",
+      "/js/restaurant_info.js",
+      ]).catch(function(error) {
+        console.log("caches.open failed: " + error);
+      });
     })
   );
 });
@@ -33,23 +36,23 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-	// TODO:  respond to requests for the root page with
-	// the page skeleton from the cache
+  // TODO:  respond to requests for the root page with
+  // the page skeleton from the cache
 
-	var requestUrl	=	new URL(event.request.url);
+  var requestUrl	=	new URL(event.request.url);
 
-	if (requestUrl.origin === location.origin) {
-		if (requestUrl.pathname === '/') {
-			event.respondWith(caches.match('/skeleton'));
-			return;
-		}
-	}
+  if (requestUrl.origin === location.origin) {
+    if (requestUrl.pathname === '/') {
+      event.respondWith(caches.match('/skeleton'));
+      return;
+    }
+  }
 
-	event.respondWith(
-		caches.match(event.request).then(function(response) {
-			return response || fetch(event.request);
-		})
-	);
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    })
+  );
 });
 
 self.addEventListener('message', function(event) {
