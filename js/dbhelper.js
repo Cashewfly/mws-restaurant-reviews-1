@@ -16,23 +16,20 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        console.log("xhr.responseText\n" + xhr.responseText);
-        const json = JSON.parse(xhr.responseText);
 
-        debugger;
-        console.log("json\n" + json);
-        const restaurants = json.restaurants;
+
+
+
+
+
+
+    fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(response => {
+      response.json().then(restaurants => {     // restaurants is an array
         callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+      });
+    }).catch(error => {
+      callback('Dude - ${error}',null);	//	TODO better error handling please
+    });
   }
 
   /**
