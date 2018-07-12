@@ -99,7 +99,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
 
-  const image_400 = DBHelper.imageUrlForRestaurant(restaurant).replace(".","_400.");
+  const image_400 = DBHelper.imageUrlForRestaurant(restaurant) + "_400.jpg";
   const image_600 = image_400.replace("_400.","_600.");
 
   image.src = image_400;
