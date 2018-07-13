@@ -145,7 +145,8 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return ('/img/' + (restaurant.photograph || restaurant.id));
+    //debugger; restaurant.photograph = null; restaurant.id = null;
+    return ('/img/' + (restaurant.photograph || restaurant.id || "image_missing"));
   }
 
   /**
