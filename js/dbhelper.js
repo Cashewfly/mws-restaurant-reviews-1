@@ -4,6 +4,19 @@
 
 import idb from "idb";
 
+//https://github.com/jakearchibald/idb
+
+var dbPromise = idb.open('udacity-rr-idb',/*version*/1,upgradeDb => {
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      var keyValStore = upgradeDb.createObjectStore('keyval');
+    default:
+      console.log("Unhandled version " + upgradeDb.oldversion + "in idb.open");
+    // end default
+  }
+  // TODO: create an index on 'people' named 'age', ordered by 'age'
+});
+
 class DBHelper {
 
   /**
