@@ -2,7 +2,11 @@
  * Common database helper functions.
  */
 
-import idb from "idb";
+//import idb from "idb";		
+
+//The above doesn't work.  According to
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
+//it should be compatible with the version of chrome I'm using.
 
 //https://github.com/jakearchibald/idb
 
