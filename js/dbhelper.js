@@ -42,7 +42,7 @@ class DBHelper {
         callback(null, restaurants);
       });
     }).catch(error => {
-      callback('Dude - ${error}',null);	//	TODO better error handling please
+      callback("fetchRestaurants: " + error,null);
     });
   }
 
