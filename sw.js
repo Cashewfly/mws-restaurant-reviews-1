@@ -42,30 +42,33 @@ self.addEventListener('activate', function(event) {
 //event that is handed to this listener will do it's default fetch action
 //unless somewhere in the listener there is a event.respondWith(...).  Note
 //that event.respondWith(...) returns a Promise.
+//
+//Note that dbhelper expects the response in the format that it comes from the
+//server.  Also note that I can change that :)
 
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
 
-  event.respondWith(
-    if (url.port === "1337") {
-      if (event.request.method === "GET") {
-        console.log("GET: "+url);
+  if (url.port === "1337") {
+    if (event.request.method === "GET") {
+      console.log("GET: "+url);
 
-        fetch(event.request).then(function(response) {
-          return.response;
-        }).catch(function(error) {
-          console.log("Responding with an error " + error);
-          event.respondWith(new Response("Error fetching data",{status:500}));
-        });
-      }
-    } else {
-      console.log("NOP "+event.request.method + " " + url);
+      fetch(event.request).then(function(response) {
+        return response;
+      }).catch(function(error) {
+        console.log("Responding with an error " + error);
+        event.respondWith(new Response("Error fetching data",{status:500}));
+      });
+    }
+  } else {
+    console.log("NOP "+event.request.method + " " + url);
 
+    event.respondWith(
       caches.match(event.request).then(function(response) {
         return response || fetch(event.request);
       })
-    }
-  );
+    );
+  }
 });
 
 self.addEventListener('message', function(event) {
