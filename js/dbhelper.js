@@ -167,7 +167,7 @@ class DBHelper {
   static imageUrlForRestaurant(restaurant) {
     //debugger; restaurant.photograph = null; restaurant.id = null;
     return ('/img/' + (restaurant.photograph || restaurant.id || "image_missing"));
-	//	TODO	could use a better "image_missing" image...
+    //TODO could use a better "image_missing" image...
   }
 
   /**
