@@ -1,3 +1,5 @@
+//https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+
 var staticCacheName = 'restrev-v2';
 
 self.addEventListener('install', function(event) {
@@ -36,47 +38,34 @@ self.addEventListener('activate', function(event) {
   );
 });
 
+//Per https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent, the
+//event that is handed to this listener will do it's default fetch action
+//unless somewhere in the listener there is a event.respondWith(...).  Note
+//that event.respondWith(...) returns a Promise.
+
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
 
-  console.log("event.request.method="+event.request.method + " " + url);
+  event.respondWith(
+    if (url.port === "1337") {
+      if (event.request.method === "GET") {
+        console.log("GET: "+url);
 
-  if (url.port === "1337") {
-    if (event.request.method === "GET") {
-      console.log("port="+url.port);
-
-      fetch(event.request).then(function(response) {
-        response.json().then(function(json) {
-          console.log("json");
+        fetch(event.request).then(function(response) {
+          return.response;
+        }).catch(function(error) {
+          console.log("Responding with an error " + error);
+          event.respondWith(new Response("Error fetching data",{status:500}));
         });
-        console.log("Responding with dude");
-        event.respondWith(new Response("Dude",{status:200}));
-      }).catch(function(error) {
-        console.log("Responding with an error " + error);
-        event.respondWith(new Response("Error fetching data",{status:500}));
-      });
-      console.log("post-fetch");
-      return;
-      console.log("post-return post-fetch");
+      }
     } else {
-      console.log("Responding with dood");
-      event.respondWith(new Response("Dood",{status:500}));
-      return;
-      console.log("post-return dood");
-    }
-    console.log("How the heck am I here?");
-    event.respondWith(new Response("What?",{status:500}));
-    return;
-    console.log("post-return heck");
-  } else {
-    console.log("Oh crap");
+      console.log("NOP "+event.request.method + " " + url);
 
-    event.respondWith(
       caches.match(event.request).then(function(response) {
         return response || fetch(event.request);
       })
-    );
-  }
+    }
+  );
 });
 
 self.addEventListener('message', function(event) {
