@@ -1,5 +1,23 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
+//TODO Note that having this in multiple places is an invitation for problems...
+
+
+var dbPromise = idb.open('udacity-rr-idb',/*version*/0,upgradeDb => {
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      var db = upgradeDb.createObjectStore('rr',{keyPath: "key"});  // At this point I'm not sure 
+      db.createIndex("rr_key","rr_key");                            // that storing anything but the 
+                                                                    // single giant json response has
+                                                                    // benefit given the way dbhelper 
+                                                                    // works.  Performance tests will
+                                                                    // tell... TODO
+    // end case - remember to fall through on cases for versioning
+  }
+  // TODO: create an index on 'people' named 'age', ordered by 'age'
+});
+
+
 var staticCacheName = 'restrev-v2';
 
 self.addEventListener('install', function(event) {
@@ -54,6 +72,15 @@ self.addEventListener('fetch', function(event) {
       console.log("GET: "+url);
 
       fetch(event.request).then(function(response) {
+        // TODO - first test - store it, then return it.  No retrieving
+
+        dbPromise.then(function(db) {
+          var tx    = db.transaction('udacity-rr-idb','readwrite');
+          var store = tx.objectStore('udacity-rr-idb');
+
+          store.put(response);
+        })
+
         return response;
       }).catch(function(error) {
         console.log("Responding with an error " + error);
@@ -61,7 +88,7 @@ self.addEventListener('fetch', function(event) {
       });
     }
   } else {
-    console.log("NOP "+event.request.method + " " + url);
+    //console.log("!1337 "+event.request.method + " " + url);
 
     event.respondWith(
       caches.match(event.request).then(function(response) {
