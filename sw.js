@@ -1,9 +1,10 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
+importScripts('js/idb.js');
+
 //TODO Note that having this in multiple places is an invitation for problems...
 
-
-var dbPromise = idb.open('udacity-rr-idb',/*version*/0,upgradeDb => {
+var dbPromise = idb.open('udacity-rr-idb',/*version*/1,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
       var db = upgradeDb.createObjectStore('rr',{keyPath: "key"});  // At this point I'm not sure 
@@ -14,9 +15,7 @@ var dbPromise = idb.open('udacity-rr-idb',/*version*/0,upgradeDb => {
                                                                     // tell... TODO
     // end case - remember to fall through on cases for versioning
   }
-  // TODO: create an index on 'people' named 'age', ordered by 'age'
 });
-
 
 var staticCacheName = 'restrev-v2';
 
@@ -73,14 +72,12 @@ self.addEventListener('fetch', function(event) {
 
       fetch(event.request).then(function(response) {
         // TODO - first test - store it, then return it.  No retrieving
-
         dbPromise.then(function(db) {
           var tx    = db.transaction('udacity-rr-idb','readwrite');
           var store = tx.objectStore('udacity-rr-idb');
 
           store.put(response);
         })
-
         return response;
       }).catch(function(error) {
         console.log("Responding with an error " + error);
@@ -103,3 +100,4 @@ self.addEventListener('message', function(event) {
     self.skipWaiting();
   }
 });
+

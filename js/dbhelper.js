@@ -1,24 +1,20 @@
-/**
- * Common database helper functions.
- */
-
-//import idb from "idb";		
-
-//The above doesn't work.  According to
-//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
-//it should be compatible with the version of chrome I'm using.
-
 //https://github.com/jakearchibald/idb
+
+
+
+//TODO Note that having this in multiple places is an invitation for problems...
 
 var dbPromise = idb.open('udacity-rr-idb',/*version*/1,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      var keyValStore = upgradeDb.createObjectStore('keyval');
-    default:
-      console.log("Unhandled version " + upgradeDb.oldversion + "in idb.open");
-    // end default
+      var db = upgradeDb.createObjectStore('rr',{keyPath: "key"});  // At this point I'm not sure 
+      db.createIndex("rr_key","rr_key");                            // that storing anything but the 
+                                                                    // single giant json response has
+                                                                    // benefit given the way dbhelper 
+                                                                    // works.  Performance tests will
+                                                                    // tell... TODO
+    // end case - remember to fall through on cases for versioning
   }
-  // TODO: create an index on 'people' named 'age', ordered by 'age'
 });
 
 class DBHelper {
