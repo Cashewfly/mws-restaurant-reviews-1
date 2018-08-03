@@ -4,15 +4,17 @@ importScripts('js/idb.js');
 
 //TODO Note that having this in multiple places is an invitation for problems...
 
-var dbPromise = idb.open('udacity-rr-idb',/*version*/1,upgradeDb => {
+const db_name     =  'udacity-rr-idb';
+const db_store    =  'rr';
+const db_index    =  'rr_key';
+const db_key      =  'rr_key';
+const db_version  =  1;
+
+var dbPromise = idb.open(db_name,db_version,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      var db = upgradeDb.createObjectStore('rr',{keyPath: "key"});  // At this point I'm not sure 
-      db.createIndex("rr_key","rr_key");                            // that storing anything but the 
-                                                                    // single giant json response has
-                                                                    // benefit given the way dbhelper 
-                                                                    // works.  Performance tests will
-                                                                    // tell... TODO
+      var db = upgradeDb.createObjectStore(db_store,{});
+
     // end case - remember to fall through on cases for versioning
   }
 });
@@ -73,11 +75,13 @@ self.addEventListener('fetch', function(event) {
       fetch(event.request).then(function(response) {
         // TODO - first test - store it, then return it.  No retrieving
         dbPromise.then(function(db) {
-          var tx    = db.transaction('udacity-rr-idb','readwrite');
-          var store = tx.objectStore('udacity-rr-idb');
+          response.json().then(function(json) {
+             var tx    = db.transaction(db_store,'readwrite');
+             var store = tx.objectStore(db_store);
 
-          store.put(response);
-        })
+             store.add(json,'blob');
+          });
+        });
         return response;
       }).catch(function(error) {
         console.log("Responding with an error " + error);

@@ -2,21 +2,6 @@
 
 
 
-//TODO Note that having this in multiple places is an invitation for problems...
-
-var dbPromise = idb.open('udacity-rr-idb',/*version*/1,upgradeDb => {
-  switch (upgradeDb.oldVersion) {
-    case 0:
-      var db = upgradeDb.createObjectStore('rr',{keyPath: "key"});  // At this point I'm not sure 
-      db.createIndex("rr_key","rr_key");                            // that storing anything but the 
-                                                                    // single giant json response has
-                                                                    // benefit given the way dbhelper 
-                                                                    // works.  Performance tests will
-                                                                    // tell... TODO
-    // end case - remember to fall through on cases for versioning
-  }
-});
-
 class DBHelper {
 
   /**
