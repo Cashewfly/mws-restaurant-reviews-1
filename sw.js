@@ -72,21 +72,39 @@ self.addEventListener('fetch', function(event) {
     if (event.request.method === "GET") {
       console.log("GET: "+url);
 
-      fetch(event.request).then(function(response) {
-        // TODO - first test - store it, then return it.  No retrieving
-        dbPromise.then(function(db) {
-          response.json().then(function(json) {
-             var tx    = db.transaction(db_store,'readwrite');
-             var store = tx.objectStore(db_store);
+      dbPromise.then(function(db) {
+        var tx    = db.transaction(db_store,'readwrite');
+        var store = tx.objectStore(db_store);
 
-             store.add(json,'blob');
-          });
-        });
-        return response;
-      }).catch(function(error) {
-        console.log("Responding with an error " + error);
-        event.respondWith(new Response("Error fetching data",{status:500}));
-      });
+        console.log("Retrieving blob\n");
+
+        store.get('blob').then(function(data) {
+          if (data) {
+            console.log("Returning blob data"/* + JSON.stringify(data)*/);
+            return(data);
+          } else {
+             console.log("Fetching event.request");
+
+             fetch(event.request).then(function(response) {
+               dbPromise.then(function(db) {
+                 response.clone().json().then(function(json) {
+                   var tx    = db.transaction(db_store,'readwrite');
+                   var store = tx.objectStore(db_store);
+
+                   console.log("Saving blob\n");
+
+                   store.put(json,'blob');
+                 });
+               });
+                   
+               return response;
+             }).catch(function(error) {
+               console.log("Responding with an error " + error);
+               return new Response("Error fetching data " + error,{status:500});
+             })
+          }
+        })
+      })
     }
   } else {
     //console.log("!1337 "+event.request.method + " " + url);
