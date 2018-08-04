@@ -185,7 +185,7 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   li.append(address);
 
-  const more = document.createElement('button');			//	This was the a tag
+  const more = document.createElement('button');      //  This was the a tag
   more.innerHTML = 'View Details';
   more.setAttribute("aria-label","view details " + restaurant.name);
 

@@ -4,20 +4,22 @@
 
 class DBHelper {
 
-  /**
-   * Database URL.
-   * Change this to restaurants.json file location on your server.
-   */
+  // Database URL - Change this to restaurants.json file location on your server.
   static get DATABASE_URL() {
     const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
 
-  /**
-   * Fetch all restaurants.
-   */
+  // Restaurant page URL.
+  static urlForRestaurant(restaurant) {
+    return (`./restaurant.html?id=${restaurant.id}`);
+  }
+
+  // Fetch all restaurants.
   static fetchRestaurants(callback) {
+    console.log("fetchRestaurants: pre-fetch "+DBHelper.DATABASE_URL);
     fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(response => {
+      console.log("fetchRestaurants: post-fetch "+DBHelper.DATABASE_URL);
       response.json().then(restaurants => {     // restaurants is an array
         console.log("restaurants="+restaurants);
         //console.log("restaurants="+JSON.stringify(restaurants));
@@ -28,11 +30,8 @@ class DBHelper {
     });
   }
 
-  /**
-   * Fetch a restaurant by its ID.
-   */
+  // Fetch a restaurant by its ID.
   static fetchRestaurantById(id, callback) {
-    // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -134,13 +133,6 @@ class DBHelper {
         callback(null, uniqueCuisines);
       }
     });
-  }
-
-  /**
-   * Restaurant page URL.
-   */
-  static urlForRestaurant(restaurant) {
-    return (`./restaurant.html?id=${restaurant.id}`);
   }
 
   /**

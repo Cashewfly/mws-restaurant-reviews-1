@@ -83,6 +83,7 @@ self.addEventListener('fetch', function(event) {
             console.log("Returning blob data"/* + JSON.stringify(data)*/);
             return(data);
           } else {
+debugger;
              console.log("Fetching event.request");
 
              fetch(event.request).then(function(response) {
@@ -111,7 +112,13 @@ self.addEventListener('fetch', function(event) {
 
     event.respondWith(
       caches.match(event.request).then(function(response) {
-        return response || fetch(event.request);
+        if (response) {
+          console.log("Returning cached response for " + url);
+          return response;
+        } else {
+          console.log("fetch " + url);
+          fetch(event.request);
+        }
       })
     );
   }
