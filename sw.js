@@ -123,9 +123,9 @@ self.addEventListener('fetch', function(event) {
           //console.log("Returning cached response for " + url);
           return response;
         } else {
-          var i  = url.pathname.search('/jpg|mapbox|leaflet/');
+          //var i  = url.pathname.search('/jpg|mapbox|leaflet/');
 
-          if (i == -1) console.log("fetch " +i+ url.pathname);
+          //if (i == -1) console.log("fetch " +i+ url.pathname);
           return(fetch(event.request));
         }
       })
