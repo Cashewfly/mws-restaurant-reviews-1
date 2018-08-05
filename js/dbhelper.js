@@ -1,4 +1,3 @@
-//https://github.com/jakearchibald/idb
 
 
 
@@ -10,18 +9,13 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
-  // Restaurant page URL.
-  static urlForRestaurant(restaurant) {
-    return (`./restaurant.html?id=${restaurant.id}`);
-  }
-
   // Fetch all restaurants.
   static fetchRestaurants(callback) {
     console.log("fetchRestaurants: pre-fetch "+DBHelper.DATABASE_URL);
     fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(response => {
       console.log("fetchRestaurants: post-fetch "+DBHelper.DATABASE_URL);
       response.json().then(restaurants => {     // restaurants is an array
-        console.log("restaurants="+restaurants);
+        //console.log("restaurants="+restaurants);
         //console.log("restaurants="+JSON.stringify(restaurants));
         callback(null, restaurants);
       });
@@ -37,9 +31,9 @@ class DBHelper {
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
+        if (restaurant) {
           callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
+        } else {
           callback('Restaurant does not exist', null);
         }
       }
@@ -142,6 +136,11 @@ class DBHelper {
     //debugger; restaurant.photograph = null; restaurant.id = null;
     return ('/img/' + (restaurant.photograph || restaurant.id || "image_missing"));
     //TODO could use a better "image_missing" image...
+  }
+
+  // Restaurant page URL.
+  static urlForRestaurant(restaurant) {
+    return (`./restaurant.html?id=${restaurant.id}`);
   }
 
   /**

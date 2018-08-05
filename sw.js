@@ -1,19 +1,23 @@
 //https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+//https://github.com/jakearchibald/idb
+//https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
 
 importScripts('js/idb.js');
 
-//TODO Note that having this in multiple places is an invitation for problems...
-
-const db_name     =  'udacity-rr-idb';
-const db_store    =  'rr';
-const db_index    =  'rr_key';
-const db_key      =  'rr_key';
-const db_version  =  1;
+const db_name         =  'udacity-rr-idb';
+const db_store        =  'rr';
+const db_key          =  'id';
+const i_hood          =  'neighborhood';
+const i_type          =  'cuisine_type';
+const db_version      =  1;
 
 var dbPromise = idb.open(db_name,db_version,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      var db = upgradeDb.createObjectStore(db_store,{});
+      var db = upgradeDb.createObjectStore(db_store,{keyPath: db_key});
+
+      db.createIndex(i_hood,'Neighborhood');
+      db.createIndex(i_type,'Cuisine');
 
     // end case - remember to fall through on cases for versioning
   }
@@ -35,6 +39,7 @@ self.addEventListener('install', function(event) {
         "/js/sw-register.js",    
         "/js/main.js",
         "/js/restaurant_info.js",
+        "/js/idb.js",
       ]).catch(function(error) {
         console.log("caches.open failed: " + error);
       });
@@ -76,33 +81,35 @@ self.addEventListener('fetch', function(event) {
         var tx    = db.transaction(db_store,'readwrite');
         var store = tx.objectStore(db_store);
 
-        console.log("Retrieving blob\n");
+        console.log("pre-Retrieving items\n");
 
-        store.get('blob').then(function(data) {
-          if (data) {
-            console.log("Returning blob data"/* + JSON.stringify(data)*/);
+        store.getAll().then(function(data) {
+          if (data.length) {
+            console.log("Returning " + data.length + " items");
             return(data);
           } else {
-debugger;
-             console.log("Fetching event.request");
+            console.log("Fetching event.request");
+    
+            fetch(event.request).then(function(response) {
+              dbPromise.then(function(db) {
+                response.clone().json().then(function(json_array) {
+                  var tx    = db.transaction(db_store,'readwrite');
+                  var store = tx.objectStore(db_store);
 
-             fetch(event.request).then(function(response) {
-               dbPromise.then(function(db) {
-                 response.clone().json().then(function(json) {
-                   var tx    = db.transaction(db_store,'readwrite');
-                   var store = tx.objectStore(db_store);
+                  console.log("Saving " + data.length + " items");
 
-                   console.log("Saving blob\n");
-
-                   store.put(json,'blob');
-                 });
-               });
+                  json_array.forEach(function(item) {
+                    //console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
+                    store.put(item);
+                  });
+                });
+              });
                    
-               return response;
-             }).catch(function(error) {
-               console.log("Responding with an error " + error);
-               return new Response("Error fetching data " + error,{status:500});
-             })
+              return response;
+            }).catch(function(error) {
+              console.log("Responding with an error " + error);
+              return new Response("Error fetching data " + error,{status:500});
+            })
           }
         })
       })
@@ -113,11 +120,13 @@ debugger;
     event.respondWith(
       caches.match(event.request).then(function(response) {
         if (response) {
-          console.log("Returning cached response for " + url);
+          //console.log("Returning cached response for " + url);
           return response;
         } else {
-          console.log("fetch " + url);
-          fetch(event.request);
+          var i  = url.pathname.search('/jpg|mapbox|leaflet/');
+
+          if (i == -1) console.log("fetch " +i+ url.pathname);
+          return(fetch(event.request));
         }
       })
     );
