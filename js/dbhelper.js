@@ -44,6 +44,7 @@ class DBHelper {
     });
   }
 
+  /*  Not used
   // Fetch a restaurant by its ID.
   static fetchRestaurantById(id, callback) {
     DBHelper.fetchRestaurants((error, restaurants) => {
@@ -59,7 +60,6 @@ class DBHelper {
       }
     });
   }
-  /*  Not used
   static fetchRestaurantByCuisine(cuisine, callback) {
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -86,14 +86,17 @@ class DBHelper {
   }
   */
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
-  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+  static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
     dbPromise.then(function(db) {
       var tx    = db.transaction(db_store,'readwrite');
       var store = tx.objectStore(db_store);
       var index;
       var key;
 
-      if (cuisine === 'all' && neighborhood === 'all') {
+      if (id) {
+        index   = store;
+        key     = Number(id);
+      } else if (cuisine === 'all' && neighborhood === 'all') {
         index   = store;
         key     = null;
       } else if (neighborhood === 'all') {
@@ -107,17 +110,21 @@ class DBHelper {
         key     = [neighborhood,cuisine];
       }
 
-      console.log("fetchRestaurantByCuisineAndNeighborhood> index="+index+" key="+key);
+      console.log("fetchRestaurantByParms> id="+id+" cuisine="+cuisine+" neighborhood="+neighborhood+" index="+index+" key="+key+" typeof(key)="+typeof(key));
 
       index.getAll(key).then(function(data) {
-        if (data) {
-          console.log("fetchRestaurantByCuisineAndNeighborhood> data="+data);
+        console.log("fetchRestaurantByParms> data.length="+data.length);
 
+        if (data.length > 0) {
           data.forEach(function(item) {
             console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
           });
-
-          callback(null,data);
+          
+          if (id && (data.length == 1)) {
+            callback(null,data[0]);
+          } else {
+            callback(null,data);
+          }
         } else {
           // TODO I'm 90% sure this will never happen, but I haven't rigously verified that.
           DBHelper.fetchRestaurants((error, restaurants) => {
@@ -125,11 +132,16 @@ class DBHelper {
               callback(error, null);
             } else {
               let results = restaurants;
-              if (cuisine != 'all') { // filter by cuisine
-                results = results.filter(r => r.cuisine_type == cuisine);
-              }
-              if (neighborhood != 'all') { // filter by neighborhood
-                results = results.filter(r => r.neighborhood == neighborhood);
+              
+              if (id) {
+                results  = restaurants.find(r => r.id == id);
+              } else {
+                if (cuisine != 'all') { // filter by cuisine
+                  results = results.filter(r => r.cuisine_type == cuisine);
+                }
+                if (neighborhood != 'all') { // filter by neighborhood
+                  results = results.filter(r => r.neighborhood == neighborhood);
+                }
               }
               callback(null, results);
             }
@@ -138,9 +150,16 @@ class DBHelper {
       });
     });
   }
-  /**
-   * Fetch all neighborhoods with proper error handling.
-   */
+
+  static fetchRestaurantById(id, callback) {
+    DBHelper.fetchRestaurantByParms(id,null,null,callback);
+  }
+
+  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+    DBHelper.fetchRestaurantByParms(null,cuisine,neighborhood,callback);
+  }
+
+  //Fetch all neighborhoods with proper error handling.
   static fetchNeighborhoods(callback) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
