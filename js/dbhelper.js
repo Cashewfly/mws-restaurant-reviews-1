@@ -6,6 +6,7 @@ const db_store        =  'rr';
 const db_key          =  'id';
 const i_hood          =  'neighborhood';
 const i_type          =  'cuisine_type';
+const i_hood_type     =  i_hood+i_type;
 const db_version      =  1;
 
 var dbPromise = idb.open(db_name,db_version,upgradeDb => {
@@ -13,8 +14,9 @@ var dbPromise = idb.open(db_name,db_version,upgradeDb => {
     case 0:
       var db = upgradeDb.createObjectStore(db_store,{keyPath: db_key});
 
-      db.createIndex(i_hood,'Neighborhood');
-      db.createIndex(i_type,'Cuisine');
+      db.createIndex(i_hood       ,'neighborhood');                   //  Not sure this is needed
+      db.createIndex(i_type       ,'cuisine_type');                   //  Not sure this is needed
+      db.createIndex(i_hood_type  ,['neighborhood','cuisine_type']);
 
     // end case - remember to fall through on cases for versioning
   }
@@ -70,20 +72,6 @@ class DBHelper {
     });
   }
   */
-  /* Remove when transferred below
-  static fetchRestaurantByCuisine(cuisine, callback) {
-    dbPromise.then(function(db) {
-      var tx    = db.transaction(db_store,'readwrite');
-      var store = tx.objectStore(db_store);
-      var index = store.index(i_type);
-
-      index.getAll(cuisine).then(function(data) {
-        console.log("fetchRestaurantByCuisine> retrieved "+data);
-      });
-    });
-  }
-  */
-
   /*  Not used
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     DBHelper.fetchRestaurants((error, restaurants) => {
@@ -99,23 +87,57 @@ class DBHelper {
   */
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
-    // Fetch all restaurants
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
+    dbPromise.then(function(db) {
+      var tx    = db.transaction(db_store,'readwrite');
+      var store = tx.objectStore(db_store);
+      var index;
+      var key;
+
+      if (cuisine === 'all' && neighborhood === 'all') {
+        index   = store;
+        key     = null;
+      } else if (neighborhood === 'all') {
+        index   = store.index(i_type);
+        key     = cuisine;
+      } else if (cuisine === 'all') {
+        index   = store.index(i_hood);
+        key     = neighborhood;
       } else {
-        let results = restaurants;
-        if (cuisine != 'all') { // filter by cuisine
-          results = results.filter(r => r.cuisine_type == cuisine);
-        }
-        if (neighborhood != 'all') { // filter by neighborhood
-          results = results.filter(r => r.neighborhood == neighborhood);
-        }
-        callback(null, results);
+        index   = store.index(i_hood_type);
+        key     = [neighborhood,cuisine];
       }
+
+      console.log("fetchRestaurantByCuisineAndNeighborhood> index="+index+" key="+key);
+
+      index.getAll(key).then(function(data) {
+        if (data) {
+          console.log("fetchRestaurantByCuisineAndNeighborhood> data="+data);
+
+          data.forEach(function(item) {
+            console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
+          });
+
+          callback(null,data);
+        } else {
+          // TODO I'm 90% sure this will never happen, but I haven't rigously verified that.
+          DBHelper.fetchRestaurants((error, restaurants) => {
+            if (error) {
+              callback(error, null);
+            } else {
+              let results = restaurants;
+              if (cuisine != 'all') { // filter by cuisine
+                results = results.filter(r => r.cuisine_type == cuisine);
+              }
+              if (neighborhood != 'all') { // filter by neighborhood
+                results = results.filter(r => r.neighborhood == neighborhood);
+              }
+              callback(null, results);
+            }
+          });
+        }
+      });
     });
   }
-
   /**
    * Fetch all neighborhoods with proper error handling.
    */
