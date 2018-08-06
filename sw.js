@@ -73,66 +73,21 @@ self.addEventListener('activate', function(event) {
 //server.  Also note that I can change that :)
 
 self.addEventListener('fetch', function(event) {
-  const url = new URL(event.request.url);
+  //const url = new URL(event.request.url);
 
-  if (0 && url.port === "1337") {
-    if (event.request.method === "GET") {
-      console.log("GET: "+url);
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      if (response) {
+        //console.log("Returning cached response for " + url);
+        return response;
+      } else {
+        //var i  = url.pathname.search('/jpg|mapbox|leaflet/');
 
-      dbPromise.then(function(db) {
-        var tx    = db.transaction(db_store,'readwrite');
-        var store = tx.objectStore(db_store);
-
-        console.log("pre-Retrieving items\n");
-
-        store.getAll().then(function(data) {
-          if (data.length) {
-            console.log("Returning " + data.length + " items");
-            return(data);
-          } else {
-            console.log("Fetching event.request");
-    
-            fetch(event.request).then(function(response) {
-              dbPromise.then(function(db) {
-                response.clone().json().then(function(json_array) {
-                  var tx    = db.transaction(db_store,'readwrite');
-                  var store = tx.objectStore(db_store);
-
-                  console.log("Saving " + data.length + " items");
-
-                  json_array.forEach(function(item) {
-                    //console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
-                    store.put(item);
-                  });
-                });
-              });
-                   
-              return response;
-            }).catch(function(error) {
-              console.log("Responding with an error " + error);
-              return new Response("Error fetching data " + error,{status:500});
-            })
-          }
-        })
-      })
-    }
-  } else {
-    //console.log("!1337 "+event.request.method + " " + url);
-
-    event.respondWith(
-      caches.match(event.request).then(function(response) {
-        if (response) {
-          //console.log("Returning cached response for " + url);
-          return response;
-        } else {
-          //var i  = url.pathname.search('/jpg|mapbox|leaflet/');
-
-          //if (i == -1) console.log("fetch " +i+ url.pathname);
-          return(fetch(event.request));
-        }
-      })
-    );
-  }
+        //if (i == -1) console.log("fetch " +i+ url.pathname);
+        return(fetch(event.request));
+      }
+    })
+  );
 });
 
 self.addEventListener('message', function(event) {
