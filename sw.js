@@ -75,7 +75,7 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
 
-  if (url.port === "1337") {
+  if (0 && url.port === "1337") {
     if (event.request.method === "GET") {
       console.log("GET: "+url);
 

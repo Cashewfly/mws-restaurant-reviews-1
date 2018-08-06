@@ -14,8 +14,8 @@ var dbPromise = idb.open(db_name,db_version,upgradeDb => {
     case 0:
       var db = upgradeDb.createObjectStore(db_store,{keyPath: db_key});
 
-      db.createIndex(i_hood       ,'neighborhood');                   //  Not sure this is needed
-      db.createIndex(i_type       ,'cuisine_type');                   //  Not sure this is needed
+      db.createIndex(i_hood       ,'neighborhood');                 
+      db.createIndex(i_type       ,'cuisine_type');                
       db.createIndex(i_hood_type  ,['neighborhood','cuisine_type']);
 
     // end case - remember to fall through on cases for versioning
@@ -28,7 +28,7 @@ class DBHelper {
     const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
-
+  /*
   // Fetch all restaurants.
   static fetchRestaurants(callback) {
     //console.log("fetchRestaurants: pre-fetch "+DBHelper.DATABASE_URL);
@@ -43,48 +43,44 @@ class DBHelper {
       callback("fetchRestaurants: " + error,null);
     });
   }
+  */
+  static fetchRestaurants(callback) {
+    dbPromise.then(function(db) {
+      var tx    = db.transaction(db_store,'readwrite');
+      var store = tx.objectStore(db_store);
 
-  /*  Not used
-  // Fetch a restaurant by its ID.
-  static fetchRestaurantById(id, callback) {
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) {
-          callback(null, restaurant);
+      console.log("pre-Retrieving items\n");
+
+      store.getAll().then(function(data) {
+        if (data.length) {
+          console.log("Returning " + data.length + " items");
+          callback(null,data);
         } else {
-          callback('Restaurant does not exist', null);
+          console.log("Fetching event.request");
+  
+          fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(function(response) {
+            dbPromise.then(function(db) {
+              response.json().then(function(json_array) {
+                var tx    = db.transaction(db_store,'readwrite');
+                var store = tx.objectStore(db_store);
+
+                console.log("Saving " + data.length + " items");
+
+                json_array.forEach(function(item) {
+                  //console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
+                  store.put(item);
+                });
+                callback(null,json_array);
+              });
+            });
+          }).catch(function(error) {
+            callback("Error fetching data " + error,null);
+          });
         }
-      }
+      });
     });
   }
-  static fetchRestaurantByCuisine(cuisine, callback) {
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        // Filter restaurants to have only given cuisine type
-        const results = restaurants.filter(r => r.cuisine_type == cuisine);
-        callback(null, results);
-      }
-    });
-  }
-  */
-  /*  Not used
-  static fetchRestaurantByNeighborhood(neighborhood, callback) {
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        // Filter restaurants to have only given neighborhood
-        const results = restaurants.filter(r => r.neighborhood == neighborhood);
-        callback(null, results);
-      }
-    });
-  }
-  */
+
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
     dbPromise.then(function(db) {
@@ -159,9 +155,9 @@ class DBHelper {
     DBHelper.fetchRestaurantByParms(null,cuisine,neighborhood,callback);
   }
 
-  //Fetch all neighborhoods with proper error handling.
+  //Fetch all neighborhoods with proper error handling. 
+  //TODO  Pull these out of the database index
   static fetchNeighborhoods(callback) {
-    // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -175,11 +171,9 @@ class DBHelper {
     });
   }
 
-  /**
-   * Fetch all cuisines with proper error handling.
-   */
+  // Fetch all cuisines with proper error handling.
+  //TODO  Pull these out of the database index
   static fetchCuisines(callback) {
-    // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
@@ -211,6 +205,8 @@ class DBHelper {
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
+    if (! L) return(null);
+
     // https://leafletjs.com/reference-1.3.0.html#marker  
     const marker = new L.marker(
       [restaurant.latlng.lat, restaurant.latlng.lng],
@@ -224,15 +220,4 @@ class DBHelper {
 
     return marker;
   } 
-  /* static mapMarkerForRestaurant(restaurant, map) {
-    const marker = new google.maps.Marker({
-      position: restaurant.latlng,
-      title: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant),
-      map: map,
-      animation: google.maps.Animation.DROP}
-    );
-    return marker;
-  } */
-
 }
