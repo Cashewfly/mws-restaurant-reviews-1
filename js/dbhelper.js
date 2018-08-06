@@ -28,35 +28,20 @@ class DBHelper {
     const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
-  /*
-  // Fetch all restaurants.
-  static fetchRestaurants(callback) {
-    //console.log("fetchRestaurants: pre-fetch "+DBHelper.DATABASE_URL);
-    fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(response => {
-      //console.log("fetchRestaurants: post-fetch "+DBHelper.DATABASE_URL);
-      response.json().then(restaurants => {     // restaurants is an array
-        //console.log("restaurants="+restaurants);
-        //console.log("restaurants="+JSON.stringify(restaurants));
-        callback(null, restaurants);
-      });
-    }).catch(error => {
-      callback("fetchRestaurants: " + error,null);
-    });
-  }
-  */
+
   static fetchRestaurants(callback) {
     dbPromise.then(function(db) {
       var tx    = db.transaction(db_store,'readwrite');
       var store = tx.objectStore(db_store);
 
-      console.log("pre-Retrieving items\n");
+      //console.log("pre-Retrieving items\n");
 
       store.getAll().then(function(data) {
         if (data.length) {
-          console.log("Returning " + data.length + " items");
+          //console.log("Returning " + data.length + " items");
           callback(null,data);
         } else {
-          console.log("Fetching event.request");
+          //console.log("Fetching event.request");
   
           fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(function(response) {
             dbPromise.then(function(db) {
@@ -64,7 +49,7 @@ class DBHelper {
                 var tx    = db.transaction(db_store,'readwrite');
                 var store = tx.objectStore(db_store);
 
-                console.log("Saving " + data.length + " items");
+                //console.log("Saving " + data.length + " items");
 
                 json_array.forEach(function(item) {
                   //console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
@@ -106,23 +91,23 @@ class DBHelper {
         key     = [neighborhood,cuisine];
       }
 
-      console.log("fetchRestaurantByParms> id="+id+" cuisine="+cuisine+" neighborhood="+neighborhood+" index="+index+" key="+key+" typeof(key)="+typeof(key));
+      //console.log("fetchRestaurantByParms> id="+id+" cuisine="+cuisine+" neighborhood="+neighborhood+" index="+index+" key="+key+" typeof(key)="+typeof(key));
 
       index.getAll(key).then(function(data) {
-        console.log("fetchRestaurantByParms> data.length="+data.length);
+        //console.log("fetchRestaurantByParms> data.length="+data.length);
 
         if (data.length > 0) {
+          /*
           data.forEach(function(item) {
             console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
           });
-          
+          */
           if (id && (data.length == 1)) {
             callback(null,data[0]);
           } else {
             callback(null,data);
           }
         } else {
-          // TODO I'm 90% sure this will never happen, but I haven't rigously verified that.
           DBHelper.fetchRestaurants((error, restaurants) => {
             if (error) {
               callback(error, null);
@@ -156,7 +141,7 @@ class DBHelper {
   }
 
   //Fetch all neighborhoods with proper error handling. 
-  //TODO  Pull these out of the database index
+  //TODO  Pull these out of the database index with a fallback to existing code below
   static fetchNeighborhoods(callback) {
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -171,8 +156,8 @@ class DBHelper {
     });
   }
 
-  // Fetch all cuisines with proper error handling.
-  //TODO  Pull these out of the database index
+  //Fetch all cuisines with proper error handling.
+  //TODO  Pull these out of the database index with a fallback to existing code below
   static fetchCuisines(callback) {
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {

@@ -2,6 +2,7 @@
 //https://github.com/jakearchibald/idb
 //https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
 
+/*  Moved everything into js/dbhelper.js
 importScripts('js/idb.js');
 
 const db_name         =  'udacity-rr-idb';
@@ -24,7 +25,7 @@ var dbPromise = idb.open(db_name,db_version,upgradeDb => {
     // end case - remember to fall through on cases for versioning
   }
 });
-
+*/
 var staticCacheName = 'restrev-v2';
 
 self.addEventListener('install', function(event) {

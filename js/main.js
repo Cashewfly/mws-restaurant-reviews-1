@@ -167,12 +167,15 @@ createRestaurantHTML = (restaurant) => {
   const image_400 = DBHelper.imageUrlForRestaurant(restaurant) + "_400.jpg";
   const image_600 = image_400.replace("_400.","_600.");
 
-  image.src = image_400;
-  
-  //debugger;
+  image.alt       = "Photo of " + restaurant.name;
+  image.src       = image_400;
+  image.srcset    = image_400 + " 400w, " + image_600 + " 600w";
+  //image.sizes   = image_400 + " 400w, " + image_600 + " 600w";
 
-  image.srcset = image_400 + " 400w, " + image_600 + " 600w";
-  image.alt = "Photo of " + restaurant.name;
+  console.log("createRestaurantHTML> srcset="+image.srcset);
+  console.log("createRestaurantHTML> sizes ="+image.sizes );
+  console.log("createRestaurantHTML> alt   ="+image.alt   );
+
   li.append(image);
 
   const name = document.createElement('h2');

@@ -71,9 +71,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
   address.setAttribute("aria-label","Address is " + restaurant.address);
 
-  // The widest the picture will be on the 2 column details screen which is 
-  // 50% of the max 1100px screen, so 550px.  Narrowest is on the 3 column selector
-  // screen which is a bit over 300px.  That's not much of a range...
+  // The layout will be either 1, 2, or 3 columns
+  // The one column screen goes from 0-599px
+  //   The image in this case will get as large as 584px
+  // The two column screen goes from 600-1000px
+  //   The image in this case will get as large as 576px
+  // The three column screen goes from 1001px upward
   //
   // I'm going to make 400px and 600px versions to give some wiggle room on my column
   // percentages
@@ -86,9 +89,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image_400 = DBHelper.imageUrlForRestaurant(restaurant) + "_400.jpg";
   const image_600 = image_400.replace("_400.","_600.");
 
-  image.src = image_400;
-  image.srcset = image_400 + " 400w, " + image_600 + " 600w";
-  image.alt = "Photo of " + restaurant.name;
+  image.alt       = "Photo of " + restaurant.name;
+  image.src       = image_400;
+  image.srcset    = image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w";
+  image.sizes     = "(max-width: 450px) 400px, (max-width: 600px) 600px (max-width: 700px) 400px, (max-width: 1000px) 600px (max-width: 1400px) 400px, 600px";
+
+  console.log("fillRestaurantHTML> srcset="+image.srcset);
+  console.log("fillRestaurantHTML> sizes ="+image.sizes );
+  console.log("fillRestaurantHTML> alt   ="+image.alt   );
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
