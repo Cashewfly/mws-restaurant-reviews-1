@@ -1,6 +1,6 @@
 {
-  "short_name": "Maps",
-  "name": "Google Maps",
+  "short_name": "RestRev",
+  "name": "Udacity Restaurant Reviews",
   "icons": [
     {
       "src": "/images/icons-192.png",
@@ -13,9 +13,8 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/maps/?source=pwa",
+  "start_url": "index.html",
   "background_color": "#3367D6",
-  "display": "standalone",
-  "scope": "/maps/",
+  "display": "fullscreen",
   "theme_color": "#3367D6"
 }
