@@ -60,12 +60,25 @@ fetchRestaurantFromURL = (callback) => {
   }
 };
 
-/**
- * Create restaurant HTML and add it to the webpage
- */
+/*
+function reportWindowDims() {
+  // Lighthouse is knocking down my score for innerWidth not being equal to outerWidth,
+  // It's happening on both the main page and this, and only when testing a desktop that is not
+  // fullscreen.  I've not been able to find a good answer on the web for addressing this problem.
+  //
+  // This seems worth trying to figure out
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=189112#c7
+
+  console.log("window.innerWidth="+window.innerWidth + " window.outerWidth="+window.outerWidth);
+}
+*/
+
+// Create restaurant HTML and add it to the webpage
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
+
+  //name.onmouseout = reportWindowDims;
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -94,9 +107,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   image.srcset    = image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w";
   image.sizes     = "(max-width: 450px) 400px, (max-width: 600px) 600px (max-width: 700px) 400px, (max-width: 1000px) 600px (max-width: 1400px) 400px, 600px";
 
-  console.log("fillRestaurantHTML> srcset="+image.srcset);
-  console.log("fillRestaurantHTML> sizes ="+image.sizes );
-  console.log("fillRestaurantHTML> alt   ="+image.alt   );
+  //console.log("fillRestaurantHTML> srcset="+image.srcset);
+  //console.log("fillRestaurantHTML> sizes ="+image.sizes );
+  //console.log("fillRestaurantHTML> alt   ="+image.alt   );
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;

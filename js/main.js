@@ -155,9 +155,19 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   addMarkersToMap();
 };
 
-/**
- * Create restaurant HTML.
- */
+/*
+function reportWindowDims() {
+  // Lighthouse is knocking down my score for innerWidth not being equal to outerWidth,
+  // It's happening on both the main page and this, and only when testing a desktop that is not
+  // fullscreen.  I've not been able to find a good answer on the web for addressing this problem.
+  //
+  // This seems worth trying to figure out
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=189112#c7
+
+  console.log("window.innerWidth="+window.innerWidth + " window.outerWidth="+window.outerWidth);
+}
+*/
+
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
@@ -169,18 +179,20 @@ createRestaurantHTML = (restaurant) => {
 
   image.alt       = "Photo of " + restaurant.name;
   image.src       = image_400;
-  image.srcset    = image_400 + " 400w, " + image_600 + " 600w";
+  //image.srcset    = image_400 + " 400w, " + image_600 + " 600w";
   //image.sizes   = image_400 + " 400w, " + image_600 + " 600w";
 
-  console.log("createRestaurantHTML> srcset="+image.srcset);
-  console.log("createRestaurantHTML> sizes ="+image.sizes );
-  console.log("createRestaurantHTML> alt   ="+image.alt   );
+  //console.log("createRestaurantHTML> srcset="+image.srcset);
+  //console.log("createRestaurantHTML> sizes ="+image.sizes );
+  //console.log("createRestaurantHTML> alt   ="+image.alt   );
 
   li.append(image);
 
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
+
+  //name.onmouseout = reportWindowDims;
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
