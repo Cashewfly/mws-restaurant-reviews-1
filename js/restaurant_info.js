@@ -151,7 +151,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
   title.innerHTML = 'Reviews';
 
-  fav.innerHTML   = '😐';
+  fav.innerHTML   = self.restaurant.is_favorite || 1 ? '😊' : '😐';
   fav.setAttribute("aria-label","favorite " + self.restaurant.name);
 
   container.appendChild(title);
@@ -172,52 +172,57 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   container.appendChild(ul);
 };
 
-/**
- * Create review HTML and add it to the webpage.
- */
+// Create review HTML and add it to the webpage.
+
 createReviewHTML = (review) => {
-  const li = document.createElement('li');
-  const name = document.createElement('p');
-  name.innerHTML = review.name;
+  const li            = document.createElement('li');
+  const name          = document.createElement('p');
+  name.innerHTML      = review.name;
+
   li.appendChild(name);
 
-  const date = document.createElement('p');
-  date.innerHTML = review.date;
+  const date          = document.createElement('p');
+  date.innerHTML      = review.date;
+
   li.appendChild(date);
 
-  const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}`;
+  const rating        = document.createElement('p');
+  rating.innerHTML    = `Rating: ${review.rating}`;
+
   li.appendChild(rating);
 
-  const comments = document.createElement('p');
-  comments.innerHTML = review.comments;
+  const comments      = document.createElement('p');
+  comments.innerHTML  = review.comments;
+
   li.appendChild(comments);
 
   return li;
 };
 
-/**
- * Add restaurant name to the breadcrumb navigation menu
- */
+// Add restaurant name to the breadcrumb navigation menu
+
 fillBreadcrumb = (restaurant=self.restaurant) => {
-  const breadcrumb = document.getElementById('breadcrumb');
-  const li = document.createElement('li');
-  li.innerHTML = restaurant.name;
+  const breadcrumb  = document.getElementById('breadcrumb');
+  const li          = document.createElement('li');
+
+  li.innerHTML      = restaurant.name;
+
   breadcrumb.appendChild(li);
 };
 
-/**
- * Get a parameter by name from page URL.
- */
+
+// Get a parameter by name from page URL.
+
 getParameterByName = (name, url) => {
-  if (!url)
-    url = window.location.href;
+  if (! url) url = window.location.href;
+
   name = name.replace(/[[\]]/g, '\\$&');
+
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
     results = regex.exec(url);
-  if (!results)
-    return null;
-  if (!results[2])
-    return '';
+
+  if (! results     ) return null;
+  if (! results[2]  ) return '';
+
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };

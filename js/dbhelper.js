@@ -1,38 +1,46 @@
 //https://github.com/jakearchibald/idb
 //https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
 
-const db_name         =  'udacity-rr-idb';
-const db_store        =  'rr';
-const db_key          =  'id';
-const i_hood          =  'neighborhood';
-const i_type          =  'cuisine_type';
-const i_hood_type     =  i_hood+i_type;
-const db_version      =  1;
+const dbName          =  'udacity-rr-idb';
+const dbVersion       =  1;
 
-var dbPromise = idb.open(db_name,db_version,upgradeDb => {
+const sRstName        =  'restaurants';
+const iRstKey         =  'id';
+const iRstHood        =  'neighborhood';
+const iRstType        =  'cuisine_type';
+const iRstHoodType    =  iRstHood+iRstType;
+
+const sRevName        =  'reviews';
+const iRevKey         =  'id';
+const iRevRstId       =  'restaurant_id';
+
+var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      var db = upgradeDb.createObjectStore(db_store,{keyPath: db_key});
+      var db_rst = upgradeDb.createObjectStore(sRstName,{keyPath: iRstKey});
 
-      db.createIndex(i_hood       ,'neighborhood');                 
-      db.createIndex(i_type       ,'cuisine_type');                
-      db.createIndex(i_hood_type  ,['neighborhood','cuisine_type']);
+      db_rst.createIndex(iRstHood       ,'neighborhood');                 
+      db_rst.createIndex(iRstType       ,'cuisine_type');                
+      db_rst.createIndex(iRstHoodType  ,['neighborhood','cuisine_type']);
 
+      var db_rev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey});
+
+      db_rev.createIndex(iRevRstId      ,'restaurant_id');                 
     // end case - remember to fall through on cases for versioning
   }
 });
 
 class DBHelper {
   // Database URL - Change this to restaurants.json file location on your server.
-  static get DATABASE_URL() {
+  static get RESTAURANT_URL() {
     const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
 
   static fetchRestaurants(callback) {
-    dbPromise.then(function(db) {
-      var tx    = db.transaction(db_store,'readwrite');
-      var store = tx.objectStore(db_store);
+    dbPromise.then(function(db_rst) {
+      var tx    = db_rst.transaction(sRstName,'readwrite'); //  TODO try this with just read
+      var store = tx.objectStore(sRstName);
 
       //console.log("pre-Retrieving items\n");
 
@@ -43,16 +51,16 @@ class DBHelper {
         } else {
           //console.log("Fetching event.request");
   
-          fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(function(response) {
-            dbPromise.then(function(db) {
+          fetch(DBHelper.RESTAURANT_URL, {method: "GET"}).then(function(response) {
+            dbPromise.then(function(db_rst) {
               response.json().then(function(json_array) {
-                var tx    = db.transaction(db_store,'readwrite');
-                var store = tx.objectStore(db_store);
+                var tx    = db_rst.transaction(sRstName,'readwrite');
+                var store = tx.objectStore(sRstName);
 
                 //console.log("Saving " + data.length + " items");
 
                 json_array.forEach(function(item) {
-                  //console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
+                  //console.log("id: "+item[iRstKey]+" hood "+item[iRstHood]+" type "+item[iRstType]);
                   store.put(item);
                 });
                 callback(null,json_array);
@@ -68,9 +76,9 @@ class DBHelper {
 
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
-    dbPromise.then(function(db) {
-      var tx    = db.transaction(db_store,'readwrite');
-      var store = tx.objectStore(db_store);
+    dbPromise.then(function(db_rst) {
+      var tx    = db_rst.transaction(sRstName,'readwrite');
+      var store = tx.objectStore(sRstName);
       var index;
       var key;
 
@@ -81,13 +89,13 @@ class DBHelper {
         index   = store;
         key     = null;
       } else if (neighborhood === 'all') {
-        index   = store.index(i_type);
+        index   = store.index(iRstType);
         key     = cuisine;
       } else if (cuisine === 'all') {
-        index   = store.index(i_hood);
+        index   = store.index(iRstHood);
         key     = neighborhood;
       } else {
-        index   = store.index(i_hood_type);
+        index   = store.index(iRstHoodType);
         key     = [neighborhood,cuisine];
       }
 
@@ -99,7 +107,7 @@ class DBHelper {
         if (data.length > 0) {
           /*
           data.forEach(function(item) {
-            console.log("id: "+item[db_key]+" hood "+item[i_hood]+" type "+item[i_type]);
+            console.log("id: "+item[iRstKey]+" hood "+item[iRstHood]+" type "+item[iRstType]);
           });
           */
           if (id && (data.length == 1)) {
@@ -172,9 +180,41 @@ class DBHelper {
     });
   }
 
-  /**
-   * Restaurant image URL.
-   */
+  static fetchReviewsById(id, callback) {
+      var tx    = db_rev.transaction(sRevName,'readwrite'); //  TODO try this with just read
+      var store = tx.objectStore(sRevName);
+
+      store.getAll(id).then(function(data) {
+        console.log("fetchReviewsById> data.length="+data.length);
+        if (data.length > 0) {
+          debugger;
+        } else {
+          console.log("fetchReviewsById> Fetching event.request");
+  
+          fetch(DBHelper.RESTAURANT_URL, {method: "GET"}).then(function(response) {
+            dbPromise.then(function(db_rev) {
+              response.json().then(function(json_array) {
+                var tx    = db_rev.transaction(sRevName,'readwrite');
+                var store = tx.objectStore(sRevName);
+
+                console.log("fetchReviewsById> Saving " + data.length + " items");
+
+                json_array.forEach(function(item) {
+                  console.log("fetchReviewsById> id: "+item[iRstKey]);
+                  store.put(item);
+                });
+                callback(null,json_array);
+              });
+            });
+          }).catch(function(error) {
+            callback("Error fetching data " + error,null);
+          });
+        }
+      });
+  }
+
+
+  // Restaurant image URL.
   static imageUrlForRestaurant(restaurant) {
     //debugger; restaurant.photograph = null; restaurant.id = null;
     return ('/img/' + (restaurant.photograph || restaurant.id || "image_missing"));
@@ -186,9 +226,8 @@ class DBHelper {
     return (`./restaurant.html?id=${restaurant.id}`);
   }
 
-  /**
-   * Map marker for a restaurant.
-   */
+  
+  // Map marker for a restaurant.
   static mapMarkerForRestaurant(restaurant, map) {
     if (! L) return(null);
 
