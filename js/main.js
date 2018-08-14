@@ -202,7 +202,7 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   li.append(address);
 
-  const more = document.createElement('button');      //  This was the a tag
+  const more = document.createElement('button');   
   more.innerHTML = 'View Details';
   more.setAttribute("aria-label","view details " + restaurant.name);
 
@@ -215,13 +215,9 @@ createRestaurantHTML = (restaurant) => {
   return li;
 };
 
-/**
- * Add markers for current restaurants to the map.
- */
 addMarkersToMap = (restaurants = self.restaurants) => {
   if (newMap) {
     restaurants.forEach(restaurant => {
-      // Add marker to the map
       const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
       marker.on("click", onClick);
       function onClick() {

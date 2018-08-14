@@ -1,16 +1,15 @@
 let restaurant;
 var newMap;
 
-/**
- * Initialize map as soon as the page is loaded.
- */
+// Initialize map as soon as the page is loaded.
+
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
 });
 
-/**
- * Initialize leaflet map
- */
+
+// Initialize leaflet map
+
 initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
@@ -35,15 +34,16 @@ initMap = () => {
   });
 };  
  
-/**
- * Get current restaurant from page URL.
- */
+// Get current restaurant from page URL.
+
 fetchRestaurantFromURL = (callback) => {
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant);
     return;
   }
+
   const id = getParameterByName('id');
+
   if (!id) { // no id found in URL
     error = 'No restaurant id in URL';
     callback(error, null);
@@ -74,13 +74,14 @@ function reportWindowDims() {
 */
 
 // Create restaurant HTML and add it to the webpage
+
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-  const name = document.getElementById('restaurant-name');
-  name.innerHTML = restaurant.name;
+  const name      = document.getElementById('restaurant-name');
+  name.innerHTML  = restaurant.name;
 
   //name.onmouseout = reportWindowDims;
 
-  const address = document.getElementById('restaurant-address');
+  const address     = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
   address.setAttribute("aria-label","Address is " + restaurant.address);
 
@@ -96,7 +97,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   //
   // Note that convert_imgs.sh is used to create the images
 
-  const image = document.getElementById('restaurant-img');
+  const image     = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
 
   const image_400 = DBHelper.imageUrlForRestaurant(restaurant) + "_400.jpg";
@@ -111,51 +112,57 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   //console.log("fillRestaurantHTML> sizes ="+image.sizes );
   //console.log("fillRestaurantHTML> alt   ="+image.alt   );
 
-  const cuisine = document.getElementById('restaurant-cuisine');
+  const cuisine     = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   cuisine.setAttribute("aria-label","Cuisine is " + restaurant.cuisine_type);
 
-  // fill operating hours
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
+
   fillReviewsHTML();
 };
 
-/**
- * Create restaurant operating hours HTML table and add it to the webpage.
- */
+// Create restaurant operating hours HTML table and add it to the webpage.
+
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
-    const row = document.createElement('tr');
+    const row       = document.createElement('tr');
+    const day       = document.createElement('td');
+    const time      = document.createElement('td');
 
-    const day = document.createElement('td');
-    day.innerHTML = key;
+    day.innerHTML   = key;
     row.appendChild(day);
 
-    const time = document.createElement('td');
-    time.innerHTML = operatingHours[key];
+    time.innerHTML  = operatingHours[key];
     row.appendChild(time);
 
     hours.appendChild(row);
   }
 };
 
-/**
- * Create all reviews HTML and add them to the webpage.
- */
+// Create all reviews HTML and add them to the webpage.
+
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
+  const title     = document.createElement('h2');
+  const fav       = document.createElement('button');
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
+  title.innerHTML = 'Reviews';
+
+  fav.innerHTML   = '😐';
+  fav.setAttribute("aria-label","favorite " + self.restaurant.name);
+
+  container.appendChild(title);
+  container.appendChild(fav);
+
+  if (! reviews) {
+    const noReviews     = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
+
     container.appendChild(noReviews);
+
     return;
   }
   const ul = document.getElementById('reviews-list');
