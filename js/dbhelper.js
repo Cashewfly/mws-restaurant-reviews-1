@@ -19,15 +19,15 @@ const port            =   1337; // Change this to your server port
 var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      var db_rst = upgradeDb.createObjectStore(sRstName,{keyPath: iRstKey});
+      var sRst = upgradeDb.createObjectStore(sRstName,{keyPath: iRstKey});
 
-      db_rst.createIndex(iRstHood       ,'neighborhood');                 
-      db_rst.createIndex(iRstType       ,'cuisine_type');                
-      db_rst.createIndex(iRstHoodType  ,['neighborhood','cuisine_type']);
+      sRst.createIndex(iRstHood       ,'neighborhood');                 
+      sRst.createIndex(iRstType       ,'cuisine_type');                
+      sRst.createIndex(iRstHoodType  ,['neighborhood','cuisine_type']);
 
-      var db_rev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey});
+      var sRev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey});
 
-      db_rev.createIndex(iRevRstId      ,'restaurant_id');                 
+      sRev.createIndex(iRevRstId      ,'restaurant_id');                 
     // end case - remember to fall through on cases for versioning
   }
 });
@@ -41,8 +41,8 @@ class DBHelper {
   }
 
   static fetchRestaurants(callback) {
-    dbPromise.then(function(db_rst) {
-      var tx    = db_rst.transaction(sRstName,'readwrite'); //  TODO try this with just read
+    dbPromise.then(function(sRst) {
+      var tx    = sRst.transaction(sRstName,'readwrite'); //  TODO try this with just read
       var store = tx.objectStore(sRstName);
 
       //console.log("pre-Retrieving items\n");
@@ -55,9 +55,9 @@ class DBHelper {
           //console.log("Fetching event.request");
   
           fetch(DBHelper.RESTAURANT_URL, {method: "GET"}).then(function(response) {
-            dbPromise.then(function(db_rst) {
+            dbPromise.then(function(sRst) {
               response.json().then(function(json_array) {
-                var tx    = db_rst.transaction(sRstName,'readwrite');
+                var tx    = sRst.transaction(sRstName,'readwrite');
                 var store = tx.objectStore(sRstName);
 
                 //console.log("Saving " + data.length + " items");
@@ -79,8 +79,8 @@ class DBHelper {
 
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
-    dbPromise.then(function(db_rst) {
-      var tx    = db_rst.transaction(sRstName,'readwrite');//  TODO try this with just read
+    dbPromise.then(function(sRst) {
+      var tx    = sRst.transaction(sRstName,'readwrite');//  TODO try this with just read
       var store = tx.objectStore(sRstName);
       var index;
       var key;
@@ -184,21 +184,21 @@ class DBHelper {
   }
 
   static fetchReviewsById(id, callback) {
-      var tx    = db_rev.transaction(sRevName,'readwrite'); //  TODO try this with just read
+    dbPromise.then(function(sRev) {
+      var tx    = sRev.transaction(sRevName,'readwrite'); //  TODO try this with just read
       var store = tx.objectStore(sRevName);
 
       store.getAll(id).then(function(data) {
         console.log("fetchReviewsById> data.length="+data.length);
         if (data.length > 0) {
-          debugger;
+          //debugger;
         } else {
           console.log("fetchReviewsById> Fetching event.request");
   
           fetch(DBHelper.REVIEWS_URL + '?restaurant_id='+id, {method: "GET"}).then(function(response) {
-            dbPromise.then(function(db_rev) {
-              debugger;
+            dbPromise.then(function(sRev) {
               response.json().then(function(json_array) {
-                var tx    = db_rev.transaction(sRevName,'readwrite');
+                var tx    = sRev.transaction(sRevName,'readwrite');
                 var store = tx.objectStore(sRevName);
 
                 console.log("fetchReviewsById> Saving " + data.length + " items");
@@ -215,8 +215,8 @@ class DBHelper {
           });
         }
       });
+    });
   }
-
 
   // Restaurant image URL.
   static imageUrlForRestaurant(restaurant) {

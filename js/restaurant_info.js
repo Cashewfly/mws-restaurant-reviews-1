@@ -3,38 +3,17 @@ var newMap;
 
 // Initialize map as soon as the page is loaded.
 
-document.addEventListener('DOMContentLoaded', (event) => {  
-  initMap();
-});
-
-// Initialize leaflet map
-
-initMap = () => {
-  console.log("restaurant_info.js> in-initmap\n");
+document.addEventListener('DOMContentLoaded', (event) => { 
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
     } else {      
-      self.newMap = L.map('map', {
-        center: [restaurant.latlng.lat, restaurant.latlng.lng],
-        zoom: 16,
-        scrollWheelZoom: false
-      });
-      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-        mapboxToken: 'pk.eyJ1IjoiY2F0Y2gyMjIiLCJhIjoiY2pqY2U4MHB4MHA1eDN3b2x4YXNhaXMxZiJ9.4ct3bFt1IdQqub76IAQIRQ',
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-          '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: 'mapbox.streets'    
-      }).addTo(newMap);
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
+      buildRestaurantPage();
     }
   });
-};  
- 
-// Get current restaurant from page URL.
+});
+
+// Get current restaurant from page URL. URL looks like localhost:8000/restaurant.html?id=1
 
 fetchRestaurantFromURL = (callback) => {
   console.log("restaurant_info.js> in-fetchRestaurantFromURL\n");
@@ -51,16 +30,58 @@ fetchRestaurantFromURL = (callback) => {
   } else {
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
-      if (!restaurant) {
+
+      if ((! restaurant) || error) {
         console.error(error);
         return;
       }
-      fillRestaurantHTML();
-      callback(null, restaurant);
+
+      DBHelper.fetchReviewsById(id, (error, reviews) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        restaurant.reviews  = reviews;
+        callback(null, restaurant);
+      });
     });
   }
 };
 
+buildRestaurantPage = (restaurant = self.restaurant) => {
+  initMap();
+  fillBreadcrumb();
+  fillRestaurantHTML();
+  fillRestaurantHoursHTML();
+
+  fillReviewsHTML();
+};
+
+// Initialize leaflet map
+
+initMap = (restaurant = self.restaurant) => {
+  console.log("restaurant_info.js> in-initmap\n");
+
+  self.newMap = L.map('map', {
+    center: [restaurant.latlng.lat, restaurant.latlng.lng],
+    zoom: 16,
+    scrollWheelZoom: false
+
+
+  });
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+    mapboxToken: 'pk.eyJ1IjoiY2F0Y2gyMjIiLCJhIjoiY2pqY2U4MHB4MHA1eDN3b2x4YXNhaXMxZiJ9.4ct3bFt1IdQqub76IAQIRQ',
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    id: 'mapbox.streets'    
+  }).addTo(newMap);
+
+  DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
+};  
+ 
 /*
 function reportWindowDims() {
   // Lighthouse is knocking down my score for innerWidth not being equal to outerWidth,
@@ -117,18 +138,18 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine     = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   cuisine.setAttribute("aria-label","Cuisine is " + restaurant.cuisine_type);
-
-  if (restaurant.operating_hours) {
-    fillRestaurantHoursHTML();
-  }
-
-  fillReviewsHTML();
 };
 
 // Create restaurant operating hours HTML table and add it to the webpage.
 
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
   console.log("restaurant_info.js> in-fillRestaurantHoursHTML\n");
+
+  if (! operatingHours) {
+    //TODO - might be nice to let the user know the lack of hours...
+    return;
+  }
+
   const hours = document.getElementById('restaurant-hours');
   for (let key in operatingHours) {
     const row       = document.createElement('tr');
