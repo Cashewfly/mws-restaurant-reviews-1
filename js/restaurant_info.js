@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // Get current restaurant from page URL. URL looks like localhost:8000/restaurant.html?id=1
 
 fetchRestaurantFromURL = (callback) => {
-  console.log("restaurant_info.js> in-fetchRestaurantFromURL\n");
   if (self.restaurant) { // restaurant already fetched!
     callback(null, self.restaurant);
     return;
@@ -61,8 +60,6 @@ buildRestaurantPage = (restaurant = self.restaurant) => {
 // Initialize leaflet map
 
 initMap = (restaurant = self.restaurant) => {
-  console.log("restaurant_info.js> in-initmap\n");
-
   self.newMap = L.map('map', {
     center: [restaurant.latlng.lat, restaurant.latlng.lng],
     zoom: 16,
@@ -98,7 +95,6 @@ function reportWindowDims() {
 // Create restaurant HTML and add it to the webpage
 
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-  console.log("restaurant_info.js> in-fillRestaurantHTML\n");
   const name      = document.getElementById('restaurant-name');
   name.innerHTML  = restaurant.name;
 
@@ -143,8 +139,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 // Create restaurant operating hours HTML table and add it to the webpage.
 
 fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
-  console.log("restaurant_info.js> in-fillRestaurantHoursHTML\n");
-
   if (! operatingHours) {
     //TODO - might be nice to let the user know the lack of hours...
     return;
@@ -166,18 +160,29 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
   }
 };
 
+function favorite_char(is_favorite) {
+  return(is_favorite ? '😎' : '😐');
+}
+
 // Create all reviews HTML and add them to the webpage.
 
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  console.log("restaurant_info.js> in-fillReviewsHTML\n");
+fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
   const title     = document.createElement('h2');
   const fav       = document.createElement('button');
 
   title.innerHTML = 'Reviews';
 
-  fav.innerHTML   = self.restaurant.is_favorite ? '😊' : '😐';
-  fav.setAttribute("aria-label","favorite " + self.restaurant.name);
+  fav.innerHTML   = favorite_char(restaurant.is_favorite);
+  fav.setAttribute("aria-label","favorite " + restaurant.name);
+
+  fav.onclick = function() {
+    restaurant.is_favorite  = (! restaurant.is_favorite);
+
+    fav.innerHTML   = favorite_char(restaurant.is_favorite);
+
+    DBHelper.saveRestaurant(restaurant);
+  };
 
   container.appendChild(title);
   container.appendChild(fav);
@@ -200,7 +205,6 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 // Create review HTML and add it to the webpage.
 
 createReviewHTML = (review) => {
-  console.log("restaurant_info.js> in-createReviewHTML\n");
   const li            = document.createElement('li');
   const name          = document.createElement('p');
   name.innerHTML      = review.name;
@@ -225,11 +229,9 @@ createReviewHTML = (review) => {
   return li;
 };
 
-console.log("restaurant_info.js> pre-fillBreadCrumb\n");
 // Add restaurant name to the breadcrumb navigation menu
 
 fillBreadcrumb = (restaurant=self.restaurant) => {
-  console.log("restaurant_info.js> in-fillBreadCrumb\n");
   const breadcrumb  = document.getElementById('breadcrumb');
   const li          = document.createElement('li');
 
@@ -241,8 +243,6 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
 // Get a parameter by name from page URL.
 
 getParameterByName = (name, url) => {
-  console.log("restaurant_info.js> in-getParameterByName\n");
-
   if (! url) url = window.location.href;
 
   name = name.replace(/[[\]]/g, '\\$&');

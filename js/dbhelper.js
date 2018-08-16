@@ -42,7 +42,7 @@ class DBHelper {
 
   static fetchRestaurants(callback) {
     dbPromise.then(function(sRst) {
-      var tx    = sRst.transaction(sRstName,'readwrite'); //  TODO try this with just read
+      var tx    = sRst.transaction(sRstName,'readwrite');
       var store = tx.objectStore(sRstName);
 
       //console.log("pre-Retrieving items\n");
@@ -80,7 +80,7 @@ class DBHelper {
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
     dbPromise.then(function(sRst) {
-      var tx    = sRst.transaction(sRstName,'readwrite');//  TODO try this with just read
+      var tx    = sRst.transaction(sRstName,'readwrite');
       var store = tx.objectStore(sRstName);
       var index;
       var key;
@@ -185,15 +185,15 @@ class DBHelper {
 
   static fetchReviewsById(id, callback) {
     dbPromise.then(function(sRev) {
-      var tx    = sRev.transaction(sRevName,'readwrite'); //  TODO try this with just read
+      var tx    = sRev.transaction(sRevName,'readwrite');
       var store = tx.objectStore(sRevName);
 
       store.getAll(id).then(function(data) {
-        console.log("fetchReviewsById> data.length="+data.length);
+        //console.log("fetchReviewsById> data.length="+data.length);
         if (data.length > 0) {
           //debugger;
         } else {
-          console.log("fetchReviewsById> Fetching event.request");
+          //console.log("fetchReviewsById> Fetching event.request");
   
           fetch(DBHelper.REVIEWS_URL + '?restaurant_id='+id, {method: "GET"}).then(function(response) {
             dbPromise.then(function(sRev) {
@@ -201,10 +201,10 @@ class DBHelper {
                 var tx    = sRev.transaction(sRevName,'readwrite');
                 var store = tx.objectStore(sRevName);
 
-                console.log("fetchReviewsById> Saving " + data.length + " items");
+                //console.log("fetchReviewsById> Saving " + data.length + " items");
 
                 json_array.forEach(function(item) {
-                  console.log("fetchReviewsById> id: "+item[iRstKey]);
+                  //console.log("fetchReviewsById> id: "+item[iRstKey]);
                   store.put(item);
                 });
                 callback(null,json_array);
@@ -215,6 +215,17 @@ class DBHelper {
           });
         }
       });
+    });
+  }
+
+  static saveRestaurant(restaurant) {
+    dbPromise.then(function(sRst) {
+      var tx    = sRst.transaction(sRstName,'readwrite');
+      var store = tx.objectStore(sRstName);
+
+      store.put(restaurant);
+    }).catch(function(error) {
+      callback("Error storing data " + error,null);
     });
   }
 
@@ -230,7 +241,6 @@ class DBHelper {
     return (`./restaurant.html?id=${restaurant.id}`);
   }
 
-  
   // Map marker for a restaurant.
   static mapMarkerForRestaurant(restaurant, map) {
     if (! L) return(null);
