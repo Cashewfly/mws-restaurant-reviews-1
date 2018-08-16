@@ -14,6 +14,8 @@ const sRevName        =  'reviews';
 const iRevKey         =  'id';
 const iRevRstId       =  'restaurant_id';
 
+const port            =   1337; // Change this to your server port
+
 var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
@@ -31,10 +33,11 @@ var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
 });
 
 class DBHelper {
-  // Database URL - Change this to restaurants.json file location on your server.
   static get RESTAURANT_URL() {
-    const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
+  }
+  static get REVIEWS_URL() {
+    return `http://localhost:${port}/reviews`;
   }
 
   static fetchRestaurants(callback) {
@@ -77,7 +80,7 @@ class DBHelper {
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
     dbPromise.then(function(db_rst) {
-      var tx    = db_rst.transaction(sRstName,'readwrite');
+      var tx    = db_rst.transaction(sRstName,'readwrite');//  TODO try this with just read
       var store = tx.objectStore(sRstName);
       var index;
       var key;
@@ -191,8 +194,9 @@ class DBHelper {
         } else {
           console.log("fetchReviewsById> Fetching event.request");
   
-          fetch(DBHelper.RESTAURANT_URL, {method: "GET"}).then(function(response) {
+          fetch(DBHelper.REVIEWS_URL + '?restaurant_id='+id, {method: "GET"}).then(function(response) {
             dbPromise.then(function(db_rev) {
+              debugger;
               response.json().then(function(json_array) {
                 var tx    = db_rev.transaction(sRevName,'readwrite');
                 var store = tx.objectStore(sRevName);
