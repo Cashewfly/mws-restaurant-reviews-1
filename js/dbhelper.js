@@ -25,7 +25,7 @@ var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
       sRst.createIndex(iRstType       ,'cuisine_type');                
       sRst.createIndex(iRstHoodType  ,['neighborhood','cuisine_type']);
 
-      var sRev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey});
+      var sRev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey, autoIncrement:true});
 
       sRev.createIndex(iRevRstId      ,'restaurant_id');                 
     // end case - remember to fall through on cases for versioning
@@ -225,8 +225,32 @@ class DBHelper {
 
       store.put(restaurant);
     }).catch(function(error) {
-      callback("Error storing data " + error,null);
+      console.log("Error storing restaurant " + error);
     });
+  }
+
+  static saveReview(restaurant_id,id,name,rating,comments) {
+    console.log("restaurant_id="+restaurant_id+" id="+id+" name="+name+" rating="+rating+" comments="+comments);
+/*
+    const r         = {};
+
+    //r.id            = id;
+    r.restaurant_id = restaurant_id;
+    r.createdAt     = new Date().getTime();
+    r.updatedAt     = r.createdAt;
+    r.name          = name;
+    r.rating        = rating;
+    r.comments      = comments;
+
+    dbPromise.then(function(sRev) {
+      var tx    = sRev.transaction(sRevName,'readwrite');
+      var store = tx.objectStore(sRevName);
+
+      store.put(r);
+    }).catch(function(error) {
+      console.log("Error storing review " + error);
+    });
+*/
   }
 
   // Restaurant image URL.

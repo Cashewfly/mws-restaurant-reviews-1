@@ -174,7 +174,7 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
   title.innerHTML = 'Reviews';
 
   fav.innerHTML   = favorite_char(restaurant.is_favorite);
-  fav.setAttribute("aria-label","favorite " + restaurant.name);
+  fav.setAttribute("aria-label","set " + restaurant.name + " as favorite");
 
   fav.onclick = function() {
     restaurant.is_favorite  = (! restaurant.is_favorite);
@@ -195,10 +195,16 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
 
     return;
   }
-  const ul = document.getElementById('reviews-list');
+  const ul      = document.getElementById('reviews-list');
+  var   maxId   = 0;
+
   reviews.forEach(review => {
+    if (maxId < review.id) maxId  = review.id;
+
     ul.appendChild(createReviewHTML(review));
   });
+
+  ul.appendChild(createReviewForm(restaurant.id,maxId));
   container.appendChild(ul);
 };
 
@@ -227,6 +233,79 @@ createReviewHTML = (review) => {
   li.appendChild(comments);
 
   return li;
+};
+
+createReviewForm  = (restaurant_id,id)  => {
+  const li              = document.createElement('li');
+  const table           = document.createElement('table');
+  const form            = document.createElement('div');
+  const name            = document.createElement('input');
+  const rating          = document.createElement('input');
+  const comment         = document.createElement('textarea');
+  const submit          = document.createElement('button');
+
+  //form.setAttribute("action",""     );
+  //form.setAttribute("method","post" );
+
+  name.setAttribute("type","text");
+  name.setAttribute("name","name");
+  //name.setAtrirbute("value","Kent!");
+
+  rating.setAttribute("type","text");
+  rating.setAttribute("name","rating");
+  //rating.setAttribute("value","16.5");
+
+  comment.setAttribute("name","comments");
+  comment.setAttribute("wrap","soft");
+  //comment.setAttribute("value","When the moon is in the seventh house, and Jupiter aligns with Mars, then peace will...");
+
+  submit.innerHTML      = "Submit review";
+
+  submit.onclick = function() {
+    DBHelper.saveReview(restaurant_id,id,name.value,rating.value,comment.value);
+  };
+
+  var   row,label,input;
+
+  row   = document.createElement('tr');
+  label = document.createElement('td');
+  field = document.createElement('td');
+
+  label.innerHTML = "Name";
+  field.appendChild(name);
+
+  row.appendChild(label);
+  row.appendChild(field);
+  table.appendChild(row);
+
+  row   = document.createElement('tr');
+  label = document.createElement('td');
+  field = document.createElement('td');
+
+  label.innerHTML = "Rating";
+  field.appendChild(rating);
+
+  row.appendChild(label);
+  row.appendChild(field);
+  table.appendChild(row);
+
+  row   = document.createElement('tr');
+  label = document.createElement('td');
+
+  label.innerHTML = "Comments";
+
+  row.appendChild(label);
+  table.appendChild(row);
+
+  form.appendChild(table);
+  form.appendChild(document.createElement('hr'));
+  form.appendChild(comment);
+  form.appendChild(document.createElement('hr'));
+  form.appendChild(submit);
+
+  li.appendChild(form);
+
+  return(li);
 };
 
 // Add restaurant name to the breadcrumb navigation menu
