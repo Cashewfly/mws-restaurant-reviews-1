@@ -13,6 +13,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 
+//DBHelper.flushDeferred(); Testing to see if this works...
+
+document.addEventListener('online', (event) => {
+  console.log("online");
+  DBHelper.flushDeferred();
+});
+
+document.addEventListener('offline', (event) => {
+  console.log("offline");
+});
+
 // Get current restaurant from page URL. URL looks like localhost:8000/restaurant.html?id=1
 
 fetchRestaurantFromURL = (callback) => {
@@ -267,7 +278,14 @@ createReviewForm  = (restaurant_id)  => {
   submit.innerHTML      = "Submit review";
   
   submit.onclick = function() {
-    DBHelper.saveReview(restaurant_id,name.value,rating.value,comment.value);
+    const r         = {};
+
+    r.restaurant_id = Number(restaurant_id);
+    r.name          = name.value;
+    r.rating        = rating.value;
+    r.comments      = comment.value;
+
+    DBHelper.saveReview(r);
 
     //TODO this needs to refresh the review panel and clear the form
   };

@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
 });
 
+
+document.addEventListener('online', (event) => {
+  console.log("online");
+  DBHelper.flushDeferred();
+});
+
+document.addEventListener('offline', (event) => {
+  console.log("offline");
+});
+
 /**
  * Fetch all neighborhoods and set their HTML.
  */

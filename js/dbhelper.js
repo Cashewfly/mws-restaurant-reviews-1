@@ -251,15 +251,9 @@ class DBHelper {
       callback("Error fetching data " + error,null);
     });
   }
-  static saveReview(restaurant_id,name,rating,comments) {
-    console.log("restaurant_id="+restaurant_id+" name="+name+" rating="+rating+" comments="+comments);
 
-    const r         = {};
-
-    r.restaurant_id = Number(restaurant_id);
-    r.name          = name;
-    r.rating        = rating;
-    r.comments      = comments;
+  static saveReview(r) {
+    console.log("restaurant_id="+r.restaurant_id+" name="+r.name+" rating="+r.rating+" comments="+r.comments);
 
     const opts      = {  
       method:   "POST"            ,
@@ -313,6 +307,32 @@ class DBHelper {
           console.log("saveReview> Saving for later update" + JSON.stringify(r));
 
           store.add(r);
+        });
+      });
+    });
+  }
+
+  static flushDeferred() {
+    console.log("flushDeferred> boom!");
+
+    dbPromise.then(function(sRev) {
+      var tx    = sRev.transaction(sRevName,'readwrite');
+      var store = tx.objectStore(sRevName);
+      var range = IDBKeyRange.upperBound(0);
+
+      store.iterateCursor(cursor => {
+        if (! cursor              ) return;
+        if (cursor.value.id >= 0  ) return;
+
+        const r = cursor.value;
+
+        console.log("flushDeferred> retrieved "+r.id);
+
+        store.delete(r.id).then(function() {
+          delete(r.id);
+
+          DBHelper.saveReview(r);
+          cursor.continue();
         });
       });
     });
