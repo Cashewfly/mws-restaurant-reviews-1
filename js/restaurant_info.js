@@ -238,7 +238,7 @@ createReviewForm  = (restaurant_id)  => {
   const table           = document.createElement('table');
   const form            = document.createElement('div');
   const name            = document.createElement('input');
-  const rating          = document.createElement('input');        //  TODO this should be a chooser
+  const rating          = document.createElement('select'); 
   const comment         = document.createElement('textarea');
   const submit          = document.createElement('button');
 
@@ -249,9 +249,16 @@ createReviewForm  = (restaurant_id)  => {
   name.setAttribute("name","name");
   name.value    = "Kent!";
 
-  rating.setAttribute("type","text");
   rating.setAttribute("name","rating");
-  rating.value  = "16";
+
+  for (i = 1 ; i <= 5 ; i++) {
+    const option      = document.createElement('option');
+    option.innerHTML  = i;
+
+    rating.appendChild(option);
+  }
+
+  rating.value  = "3";
 
   comment.setAttribute("name","comments");
   comment.setAttribute("wrap","soft");

@@ -25,7 +25,7 @@ var dbPromise = idb.open(dbName,dbVersion,upgradeDb => {
       sRst.createIndex(iRstType       ,'cuisine_type');                
       sRst.createIndex(iRstHoodType  ,['neighborhood','cuisine_type']);
 
-      var sRev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey, autoIncrement:true});
+      var sRev = upgradeDb.createObjectStore(sRevName,{keyPath: iRevKey});
 
       sRev.createIndex(iRevRstId      ,'restaurant_id');                 
     // end case - remember to fall through on cases for versioning
@@ -80,7 +80,7 @@ class DBHelper {
   // Fetch restaurants by a cuisine and a neighborhood with proper error handling.
   static fetchRestaurantByParms(id, cuisine, neighborhood, callback) {
     dbPromise.then(function(sRst) {
-      var tx    = sRst.transaction(sRstName,'readwrite');
+      var tx    = sRst.transaction(sRstName,'readonly');
       var store = tx.objectStore(sRstName);
       var index;
       var key;
@@ -282,7 +282,39 @@ class DBHelper {
         });
       });
     }).catch(function(error) {
-      callback("Error fetching data " + error,null);
+      //Assume we had some sort of network error.  
+      //
+      //If we save the record in the db as is right now, it will end up
+      //with an undefined id, createdAt, and updatedAt.
+      //
+      //If I set id to a negative number, I can quickly find records
+      //with negative ids to save the next time I'm online.
+      //
+      //I can easily find the next negative unique id to use since it will 
+      //be one less than the first returned record on an indexed retrieval
+      //of the reviews
+
+      dbPromise.then(function(sRev) {
+        var tx    = sRev.transaction(sRevName,'readwrite');
+        var store = tx.objectStore(sRevName);
+
+        store.getAll(null,1).then(function(records) {
+          if (records.length > 0) {
+            console.log("saveReview> retrieved " + JSON.stringify(event));
+
+            r.id =  records[0].id - 1;
+
+            if (r.id >= 0) r.id = -1;
+
+          } else {
+            console.log("saveReview> no reviews to retrieve");
+            r.id  = -1;
+          }
+          console.log("saveReview> Saving for later update" + JSON.stringify(r));
+
+          store.add(r);
+        });
+      });
     });
   }
 
