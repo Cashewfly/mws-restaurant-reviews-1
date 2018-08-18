@@ -197,17 +197,17 @@ class DBHelper {
   
           fetch(DBHelper.REVIEWS_URL + '?restaurant_id='+id, {method: "GET"}).then(function(response) {
             dbPromise.then(function(sRev) {
-              response.json().then(function(json_array) {
+              response.json().then(function(jsonArray) {
                 var tx    = sRev.transaction(sRevName,'readwrite');
                 var store = tx.objectStore(sRevName);
 
-                //console.log("fetchReviewsById> Saving " + data.length + " items");
+                //console.log("fetchReviewsById> Saving " + jsonArray.length + " items");
 
-                json_array.forEach(function(item) {
+                jsonArray.forEach(function(item) {
                   //console.log("fetchReviewsById> id: "+item[iRstKey]);
                   store.put(item);
                 });
-                callback(null,json_array);
+                callback(null,jsonArray);
               });
             });
           }).catch(function(error) {
@@ -218,39 +218,62 @@ class DBHelper {
     });
   }
 
-  static saveRestaurant(restaurant) {
-    dbPromise.then(function(sRst) {
-      var tx    = sRst.transaction(sRstName,'readwrite');
-      var store = tx.objectStore(sRstName);
+  static saveRestaurantFavorite(restaurant) {
+    //console.log("restaurant_id="+restaurant.id+" is_favorite="+restaurant.is_favorite);
 
-      store.put(restaurant);
+    const url = DBHelper.RESTAURANT_URL + "/" + restaurant.id + "/?is_favorite=" + (restaurant.is_favorite ? "true" : "false")
+
+    console.log("url="+url);
+
+    fetch(url,{method: "PUT"}).then(function(response) {
+      dbPromise.then(function(sRst) {
+        response.json().then(function(item) {
+          var tx    = sRst.transaction(sRstName,'readwrite');
+          var store = tx.objectStore(sRstName);
+
+          console.log("saveRestaurant> Fetched " + JSON.stringify(item));
+          console.log("saveRestaurant> id: "+item[iRstKey]);
+
+          store.put(item);
+        });
+      });
     }).catch(function(error) {
-      console.log("Error storing restaurant " + error);
+      callback("Error fetching data " + error,null);
     });
   }
+  static saveReview(restaurant_id,name,rating,comments) {
+    console.log("restaurant_id="+restaurant_id+" name="+name+" rating="+rating+" comments="+comments);
 
-  static saveReview(restaurant_id,id,name,rating,comments) {
-    console.log("restaurant_id="+restaurant_id+" id="+id+" name="+name+" rating="+rating+" comments="+comments);
-/*
     const r         = {};
 
-    //r.id            = id;
-    r.restaurant_id = restaurant_id;
-    r.createdAt     = new Date().getTime();
-    r.updatedAt     = r.createdAt;
+    r.restaurant_id = Number(restaurant_id);
     r.name          = name;
     r.rating        = rating;
     r.comments      = comments;
 
-    dbPromise.then(function(sRev) {
-      var tx    = sRev.transaction(sRevName,'readwrite');
-      var store = tx.objectStore(sRevName);
+    const opts      = {  
+      method:   "POST"            ,
+      body:     JSON.stringify(r) ,
+      headers:  {
+        "Content-Type": "application/json; charset=utf-8"
+      }
+    };
 
-      store.put(r);
+    fetch(DBHelper.REVIEWS_URL,opts).then(function(response) {
+      dbPromise.then(function(sRev) {
+        response.json().then(function(item) {
+          var tx    = sRev.transaction(sRevName,'readwrite');
+          var store = tx.objectStore(sRevName);
+
+          console.log("saveReview> Fetched " + JSON.stringify(item));
+          console.log("saveReview> id: "+item[iRevKey]);
+
+          store.put(item);
+        });
+      });
     }).catch(function(error) {
-      console.log("Error storing review " + error);
+      callback("Error fetching data " + error,null);
     });
-*/
   }
 
   // Restaurant image URL.

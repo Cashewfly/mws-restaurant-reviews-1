@@ -181,7 +181,7 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
 
     fav.innerHTML   = favorite_char(restaurant.is_favorite);
 
-    DBHelper.saveRestaurant(restaurant);
+    DBHelper.saveRestaurantFavorite(restaurant);
   };
 
   container.appendChild(title);
@@ -195,16 +195,14 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
 
     return;
   }
-  const ul      = document.getElementById('reviews-list');
-  var   maxId   = 0;
+  const ul = document.getElementById('reviews-list');
 
   reviews.forEach(review => {
-    if (maxId < review.id) maxId  = review.id;
-
     ul.appendChild(createReviewHTML(review));
   });
 
-  ul.appendChild(createReviewForm(restaurant.id,maxId));
+  ul.appendChild(createReviewForm(restaurant.id));
+
   container.appendChild(ul);
 };
 
@@ -235,36 +233,37 @@ createReviewHTML = (review) => {
   return li;
 };
 
-createReviewForm  = (restaurant_id,id)  => {
+createReviewForm  = (restaurant_id)  => {
   const li              = document.createElement('li');
   const table           = document.createElement('table');
   const form            = document.createElement('div');
+  const rstid           = document.createElement('input');
   const name            = document.createElement('input');
   const rating          = document.createElement('input');
   const comment         = document.createElement('textarea');
   const submit          = document.createElement('button');
 
-  //form.setAttribute("action",""     );
-  //form.setAttribute("method","post" );
+  form.setAttribute("action","http://localhost:1337/reviews/");
+  form.setAttribute("method","post" );
 
   name.setAttribute("type","text");
   name.setAttribute("name","name");
-  //name.setAtrirbute("value","Kent!");
+  name.value    = "Kent!";
 
   rating.setAttribute("type","text");
   rating.setAttribute("name","rating");
-  //rating.setAttribute("value","16.5");
+  rating.value  = "16";
 
   comment.setAttribute("name","comments");
   comment.setAttribute("wrap","soft");
-  //comment.setAttribute("value","When the moon is in the seventh house, and Jupiter aligns with Mars, then peace will...");
+  comment.value = "When the moon is in the seventh house, and Jupiter aligns with Mars, then peace will...";
 
   submit.innerHTML      = "Submit review";
-
+  
   submit.onclick = function() {
-    DBHelper.saveReview(restaurant_id,id,name.value,rating.value,comment.value);
+    DBHelper.saveReview(restaurant_id,name.value,rating.value,comment.value);
   };
-
+  
   var   row,label,input;
 
   row   = document.createElement('tr');
