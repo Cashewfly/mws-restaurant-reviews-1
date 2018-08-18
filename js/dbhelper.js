@@ -221,7 +221,7 @@ class DBHelper {
   static saveRestaurantFavorite(restaurant) {
     //console.log("restaurant_id="+restaurant.id+" is_favorite="+restaurant.is_favorite);
 
-    const url = DBHelper.RESTAURANT_URL + "/" + restaurant.id + "/?is_favorite=" + (restaurant.is_favorite ? "true" : "false")
+    const url = DBHelper.RESTAURANT_URL + "/" + restaurant.id + "/?is_favorite=" + Boolean(restaurant.is_favorite);
 
     console.log("url="+url);
 
@@ -232,7 +232,17 @@ class DBHelper {
           var store = tx.objectStore(sRstName);
 
           console.log("saveRestaurant> Fetched " + JSON.stringify(item));
-          console.log("saveRestaurant> id: "+item[iRstKey]);
+          console.log("saveRestaurant> id: "+item[iRstKey]+" typeof(is_favorite)="+typeof(item.is_favorite));
+
+          //Updating isFavorite via the URL saves the value
+          //as a string, which is simply returned on the fetch.
+          //Need to update it back to a boolean for the DB
+
+          if (typeof(item.is_favorite) === 'string') {
+            item.is_favorite = (item.is_favorite === 'true'); 
+          }
+
+          console.log("saveRestaurant> Fixed " + JSON.stringify(item));
 
           store.put(item);
         });
