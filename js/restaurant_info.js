@@ -237,9 +237,8 @@ createReviewForm  = (restaurant_id)  => {
   const li              = document.createElement('li');
   const table           = document.createElement('table');
   const form            = document.createElement('div');
-  const rstid           = document.createElement('input');
   const name            = document.createElement('input');
-  const rating          = document.createElement('input');
+  const rating          = document.createElement('input');        //  TODO this should be a chooser
   const comment         = document.createElement('textarea');
   const submit          = document.createElement('button');
 
@@ -262,6 +261,8 @@ createReviewForm  = (restaurant_id)  => {
   
   submit.onclick = function() {
     DBHelper.saveReview(restaurant_id,name.value,rating.value,comment.value);
+
+    //TODO this needs to refresh the review panel and clear the form
   };
   
   var   row,label,input;
