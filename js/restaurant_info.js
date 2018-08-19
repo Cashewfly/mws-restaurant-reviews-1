@@ -11,14 +11,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
       buildRestaurantPage();
     }
   });
-
-  //Comment out the following if the 'online' listener below starts working
-  window.setInterval(function(){if (navigator.onLine) DBHelper.flushDeferred;},60000);
 });
 
 //DBHelper.flushDeferred(); //Testing to see if this works...
 
-document.addEventListener('online', (event) => {
+window.addEventListener('online', (event) => {
   DBHelper.flushDeferred();
 });
 
