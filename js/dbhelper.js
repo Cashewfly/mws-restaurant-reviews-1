@@ -313,6 +313,8 @@ class DBHelper {
   }
 
   static flushDeferred() {
+    console.log("flushDeferred running at "+new Date());
+
     dbPromise.then(function(sRev) {
       var tx    = sRev.transaction(sRevName,'readwrite');
       var store = tx.objectStore(sRevName);

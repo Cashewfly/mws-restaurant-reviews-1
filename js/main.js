@@ -13,14 +13,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
 });
 
-
-document.addEventListener('online', (event) => {
-  console.log("online");
+window.addEventListener('online', (event) => {
   DBHelper.flushDeferred();
-});
-
-document.addEventListener('offline', (event) => {
-  console.log("offline");
 });
 
 /**
