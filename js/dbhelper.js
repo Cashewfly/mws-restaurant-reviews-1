@@ -313,8 +313,6 @@ class DBHelper {
   }
 
   static flushDeferred() {
-    console.log("flushDeferred> boom!");
-
     dbPromise.then(function(sRev) {
       var tx    = sRev.transaction(sRevName,'readwrite');
       var store = tx.objectStore(sRevName);
@@ -323,6 +321,11 @@ class DBHelper {
       store.iterateCursor(cursor => {
         if (! cursor              ) return;
         if (cursor.value.id >= 0  ) return;
+
+        if (! navigator.onLine) {
+          console.log("flushDeferred> stopping - navigator.onLine is "+navigator.onLine);
+          return;
+        }
 
         const r = cursor.value;
 

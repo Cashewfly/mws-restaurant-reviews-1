@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 
-//DBHelper.flushDeferred(); Testing to see if this works...
+//DBHelper.flushDeferred(); //Testing to see if this works...
 
 document.addEventListener('online', (event) => {
   console.log("online");
@@ -183,8 +183,10 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
   const fav       = document.createElement('button');
 
   title.innerHTML = 'Reviews';
+  title.setAttribute("id","title-reviews");
 
   fav.innerHTML   = favorite_char(restaurant.is_favorite);
+  fav.setAttribute("id","favorite");
   fav.setAttribute("aria-label","set " + restaurant.name + " as favorite");
 
   fav.onclick = function() {
@@ -212,7 +214,7 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
     ul.appendChild(createReviewHTML(review));
   });
 
-  ul.appendChild(createReviewForm(restaurant.id));
+  ul.appendChild(createReviewForm(restaurant.id,ul));
 
   container.appendChild(ul);
 };
@@ -244,7 +246,7 @@ createReviewHTML = (review) => {
   return li;
 };
 
-createReviewForm  = (restaurant_id)  => {
+createReviewForm  = (restaurant,ul)  => {
   const li              = document.createElement('li');
   const table           = document.createElement('table');
   const form            = document.createElement('div');
@@ -256,11 +258,12 @@ createReviewForm  = (restaurant_id)  => {
   form.setAttribute("action","http://localhost:1337/reviews/");
   form.setAttribute("method","post" );
 
+  name.setAttribute("id","comment-name");
   name.setAttribute("type","text");
-  name.setAttribute("name","name");
-  name.value    = "Kent!";
+  name.setAttribute("aria-label","Your name for comment submission");
 
-  rating.setAttribute("name","rating");
+  rating.setAttribute("id","comment-rating");
+  rating.setAttribute("aria-label","Rating for " + restaurant.name);
 
   for (i = 1 ; i <= 5 ; i++) {
     const option      = document.createElement('option');
@@ -269,25 +272,35 @@ createReviewForm  = (restaurant_id)  => {
     rating.appendChild(option);
   }
 
-  rating.value  = "3";
-
-  comment.setAttribute("name","comments");
+  comment.setAttribute("id","comment-comments");
   comment.setAttribute("wrap","soft");
-  comment.value = "When the moon is in the seventh house, and Jupiter aligns with Mars, then peace will...";
+  comment.setAttribute("rows",8);
+  comment.setAttribute("aria-label","Your comments on " + restaurant.name);
 
-  submit.innerHTML      = "Submit review";
-  
+  submit.innerHTML  = "Submit review";
+  /*
+  name.value        = "Kent?";
+  rating.value      = "3";
+  comment.value     = "When the moon is in the seventh house, and Jupiter aligns with Mars.then({...});";
+  */
   submit.onclick = function() {
     const r         = {};
 
-    r.restaurant_id = Number(restaurant_id);
+    r.restaurant_id = Number(restaurant.id);
     r.name          = name.value;
     r.rating        = rating.value;
     r.comments      = comment.value;
 
     DBHelper.saveReview(r);
 
-    //TODO this needs to refresh the review panel and clear the form
+    r.updatedAt     = new Date(); // Don't need the result from the server, especially
+                                  // since it might be deferred
+
+    ul.insertBefore(createReviewHTML(r),li);
+
+    //name.value    = "Kent!";
+    //rating.value  = "5";
+    comment.value   = "";//"planets now peace guided!";
   };
   
   var   row,label,input;
