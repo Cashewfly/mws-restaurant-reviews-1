@@ -136,10 +136,6 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   image.srcset    = image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w, " + image_400 + " 400w, " + image_600 + " 600w";
   image.sizes     = "(max-width: 450px) 400px, (max-width: 600px) 600px (max-width: 700px) 400px, (max-width: 1000px) 600px (max-width: 1400px) 400px, 600px";
 
-  //console.log("fillRestaurantHTML> srcset="+image.srcset);
-  //console.log("fillRestaurantHTML> sizes ="+image.sizes );
-  //console.log("fillRestaurantHTML> alt   ="+image.alt   );
-
   const cuisine     = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   cuisine.setAttribute("aria-label","Cuisine is " + restaurant.cuisine_type);

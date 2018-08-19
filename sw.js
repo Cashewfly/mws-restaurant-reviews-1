@@ -1,31 +1,5 @@
-//https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
-//https://github.com/jakearchibald/idb
-//https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+//importScripts('js/idb.js');
 
-/*  Moved everything into js/dbhelper.js
-importScripts('js/idb.js');
-
-const db_name         =  'udacity-rr-idb';
-const db_store        =  'rr';
-const db_key          =  'id';
-const i_hood          =  'neighborhood';
-const i_type          =  'cuisine_type';
-const i_hood_type     =  i_hood+i_type;
-const db_version      =  1;
-
-var dbPromise = idb.open(db_name,db_version,upgradeDb => {
-  switch (upgradeDb.oldVersion) {
-    case 0:
-      var db = upgradeDb.createObjectStore(db_store,{keyPath: db_key});
-
-      db.createIndex(i_hood       ,'neighborhood');                   //  Not sure this is needed
-      db.createIndex(i_type       ,'cuisine_type');                   //  Not sure this is needed
-      db.createIndex(i_hood_type  ,['neighborhood','cuisine_type']);
-
-    // end case - remember to fall through on cases for versioning
-  }
-});
-*/
 var staticCacheName = 'restrev-v2';
 
 self.addEventListener('install', function(event) {

@@ -189,12 +189,6 @@ createRestaurantHTML = (restaurant) => {
 
   image.alt       = "Photo of " + restaurant.name;
   image.src       = image_400;
-  //image.srcset    = image_400 + " 400w, " + image_600 + " 600w";
-  //image.sizes   = image_400 + " 400w, " + image_600 + " 600w";
-
-  //console.log("createRestaurantHTML> srcset="+image.srcset);
-  //console.log("createRestaurantHTML> sizes ="+image.sizes );
-  //console.log("createRestaurantHTML> alt   ="+image.alt   );
 
   li.append(image);
 
