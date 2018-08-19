@@ -11,17 +11,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
       buildRestaurantPage();
     }
   });
+
+  //Comment out the following if the 'online' listener below starts working
+  window.setInterval(function(){if (navigator.onLine) DBHelper.flushDeferred;},60000);
 });
 
 //DBHelper.flushDeferred(); //Testing to see if this works...
 
 document.addEventListener('online', (event) => {
-  console.log("online");
   DBHelper.flushDeferred();
-});
-
-document.addEventListener('offline', (event) => {
-  console.log("offline");
 });
 
 // Get current restaurant from page URL. URL looks like localhost:8000/restaurant.html?id=1
@@ -175,6 +173,10 @@ function favorite_char(is_favorite) {
   return(is_favorite ? '😎' : '😐');
 }
 
+function favorite_label(is_favorite) {
+  return(is_favorite ? 'clear ' : 'set ');
+}
+
 // Create all reviews HTML and add them to the webpage.
 
 fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) => {
@@ -185,14 +187,15 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
   title.innerHTML = 'Reviews';
   title.setAttribute("id","title-reviews");
 
-  fav.innerHTML   = favorite_char(restaurant.is_favorite);
   fav.setAttribute("id","favorite");
-  fav.setAttribute("aria-label","set " + restaurant.name + " as favorite");
+  fav.innerHTML   = favorite_char(restaurant.is_favorite);
+  fav.setAttribute("aria-label",favorite_label(restaurant.is_favorite) + restaurant.name + " as favorite");
 
   fav.onclick = function() {
     restaurant.is_favorite  = (! restaurant.is_favorite);
 
     fav.innerHTML   = favorite_char(restaurant.is_favorite);
+    fav.setAttribute("aria-label",favorite_label(restaurant.is_favorite) + restaurant.name + " as favorite");
 
     DBHelper.saveRestaurantFavorite(restaurant);
   };
@@ -214,7 +217,7 @@ fillReviewsHTML = (restaurant = self.restaurant, reviews = restaurant.reviews) =
     ul.appendChild(createReviewHTML(review));
   });
 
-  ul.appendChild(createReviewForm(restaurant.id,ul));
+  ul.appendChild(createReviewForm(restaurant,ul));
 
   container.appendChild(ul);
 };
@@ -249,14 +252,11 @@ createReviewHTML = (review) => {
 createReviewForm  = (restaurant,ul)  => {
   const li              = document.createElement('li');
   const table           = document.createElement('table');
-  const form            = document.createElement('div');
+  const div             = document.createElement('div');
   const name            = document.createElement('input');
   const rating          = document.createElement('select'); 
   const comment         = document.createElement('textarea');
   const submit          = document.createElement('button');
-
-  form.setAttribute("action","http://localhost:1337/reviews/");
-  form.setAttribute("method","post" );
 
   name.setAttribute("id","comment-name");
   name.setAttribute("type","text");
@@ -293,8 +293,7 @@ createReviewForm  = (restaurant,ul)  => {
 
     DBHelper.saveReview(r);
 
-    r.updatedAt     = new Date(); // Don't need the result from the server, especially
-                                  // since it might be deferred
+    r.updatedAt     = new Date(); // Don't need and might not have the result from the server
 
     ul.insertBefore(createReviewHTML(r),li);
 
@@ -335,13 +334,13 @@ createReviewForm  = (restaurant,ul)  => {
   row.appendChild(label);
   table.appendChild(row);
 
-  form.appendChild(table);
-  form.appendChild(document.createElement('hr'));
-  form.appendChild(comment);
-  form.appendChild(document.createElement('hr'));
-  form.appendChild(submit);
+  div.appendChild(table);
+  div.appendChild(document.createElement('hr'));
+  div.appendChild(comment);
+  div.appendChild(document.createElement('hr'));
+  div.appendChild(submit);
 
-  li.appendChild(form);
+  li.appendChild(div);
 
   return(li);
 };

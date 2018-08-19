@@ -273,12 +273,13 @@ nav h1 a {
 }
 
 #title-reviews {
-  display: inline;
+  /*display: inline;*/
   float: left;
 }
 
 #favorite {
   /*display: inline;*/
+  margin-right: 2em;
   float: right;
 }
 
@@ -310,7 +311,7 @@ nav h1 a {
   overflow: hidden;
   padding: 0 20px 20px;
   /*position: relative;*/
-  width: 100/*85%*/;
+  width: 85%;
 }
 
 #reviews-list li p {
